@@ -37,7 +37,7 @@
     font-family: 'Noto Serif', Georgia, serif;
     line-height: 1.65;
     min-height: 100svh;
-    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
     overflow-x: hidden;
   }
   /* Tekstur kertas cat air halus */
@@ -81,6 +81,8 @@
     margin: 0;
   }
   header p { font-size: .8rem; color: var(--mut); margin: 4px 0 0; }
+
+  body.cam-mode header { display: none; }
 
   /* Status pill */
   .status-bar {
@@ -156,13 +158,14 @@
   /* Kamera */
   .cam-shell {
     position: relative;
-    width: 100%;
+    width: min(100%, max(220px, calc((100svh - 410px) * 0.75)));
     aspect-ratio: 3 / 4;
+    margin-left: auto; margin-right: auto;
     background: #23231B;
     border-radius: 18px;
     overflow: hidden;
     border: 1.5px solid #C8C4B0;
-    margin: 10px 0 14px;
+    margin: 10px auto 14px;
   }
   #video, #previewCanvas {
     width: 100%; height: 100%;
@@ -179,11 +182,11 @@
 
   /* Filter Pills */
   .filters {
-    display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 10px;
-    justify-content: center; flex-wrap: wrap;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    padding: 4px 2px 10px;
   }
   .flt {
-    padding: 6px 13px; border-radius: 999px;
+    padding: 7px 6px; border-radius: 999px; text-align: center; white-space: nowrap;
     border: 1px solid #D5D2C2; background: #FAF9F5;
     color: var(--ink); font: 500 .78rem 'Noto Serif', serif;
     cursor: pointer; transition: all .2s;
@@ -285,21 +288,6 @@
 
 <div class="wrap">
   <header>
-    <div class="monogram" aria-hidden="true">
-      <svg viewBox="0 0 120 115" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M62 45 C60 68, 52 88, 44 106" stroke="#6E7D4B" stroke-width="1.5" stroke-linecap="round"/>
-        <g transform="translate(62, 28)">
-          <ellipse cx="-14" cy="2" rx="12" ry="9" transform="rotate(-20 -14 2)" fill="#EAB9BB"/>
-          <ellipse cx="14" cy="2" rx="12" ry="9" transform="rotate(20 14 2)" fill="#EAB9BB"/>
-          <ellipse cx="-8" cy="-10" rx="11" ry="9" transform="rotate(-10 -8 -10)" fill="#F2CACB"/>
-          <ellipse cx="8" cy="-10" rx="11" ry="9" transform="rotate(10 8 -10)" fill="#F2CACB"/>
-          <ellipse cx="0" cy="6" rx="13" ry="8" fill="#DF9FA2"/>
-          <circle cx="0" cy="-1" r="4.5" fill="#4A3E3B"/>
-        </g>
-        <text x="32" y="84" font-family="'Cormorant Garamond', Georgia, serif" font-size="25" fill="#636342" text-anchor="middle">D</text>
-        <text x="86" y="84" font-family="'Cormorant Garamond', Georgia, serif" font-size="25" fill="#636342" text-anchor="middle">F</text>
-      </svg>
-    </div>
     <h1>DHANI &amp; FITRAH</h1>
     <p>10.01.2027</p>
     <div class="status-bar">
@@ -325,7 +313,7 @@
 
       <div style="display:flex;flex-direction:column;gap:8px;max-width:270px;margin:0 auto">
         <button class="btn fill" onclick="switchTab('camera')">Buka Kamera</button>
-        <button class="btn" id="copyLinkBtn" style="font-size:.82rem;padding:9px 18px">Salin Link Kamera Tamu</button>
+        <button class="btn" id="copyLinkBtn" style="font-size:.82rem;padding:9px 18px">Salin Link</button>
       </div>
     </div>
   </section>
@@ -402,7 +390,7 @@
 </div>
 
 <nav class="bottom-nav" aria-label="Menu Utama">
-  <button class="active" data-tab="qr" onclick="switchTab('qr')">Meja QR</button>
+  <button class="active" data-tab="qr" onclick="switchTab('qr')">Beranda</button>
   <button data-tab="camera" onclick="switchTab('camera')">Kamera</button>
   <button data-tab="album" onclick="switchTab('album')">Album (<span id="navCount">0</span>)</button>
 </nav>
@@ -470,7 +458,7 @@
   document.getElementById('copyLinkBtn').onclick = function() {
     navigator.clipboard?.writeText(shareUrl).then(() => {
       this.textContent = 'Link Tersalin ✓';
-      setTimeout(() => { this.textContent = 'Salin Link Kamera Tamu'; }, 2200);
+      setTimeout(() => { this.textContent = 'Salin Link'; }, 2200);
     });
   };
 
@@ -479,6 +467,7 @@
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
     document.getElementById('panel-' + tab).classList.add('active');
+    document.body.classList.toggle('cam-mode', tab === 'camera');
     document.querySelector(`.bottom-nav button[data-tab="${tab}"]`).classList.add('active');
     if (tab === 'camera' && !stream && !hasCaptured) startCamera();
   };
@@ -688,7 +677,7 @@
     canvas.style.display = 'none';
     video.style.display = 'block';
     document.getElementById('liveControls').style.display = 'flex';
-    document.getElementById('filterBar').style.display = 'flex';
+    document.getElementById('filterBar').style.display = 'grid';
     document.getElementById('postShotBox').style.display = 'none';
     if (!stream) startCamera();
   };
