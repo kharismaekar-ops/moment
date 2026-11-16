@@ -354,9 +354,11 @@
 
       <!-- Pilihan Filter -->
       <div class="filters" id="filterBar">
-        <button class="flt on" data-filter="natural">Natural</button>
-        <button class="flt" data-filter="warm">Hangat</button>
-        <button class="flt" data-filter="cool">Sejuk</button>
+        <button class="flt on" data-filter="warm">Hangat</button>
+        <button class="flt" data-filter="flash">Flash</button>
+        <button class="flt" data-filter="faded">Pudar</button>
+        <button class="flt" data-filter="blue">Biru</button>
+        <button class="flt" data-filter="natural">Natural</button>
         <button class="flt" data-filter="mono">Hitam Putih</button>
       </div>
 
@@ -392,6 +394,9 @@
       <h2 class="script" style="font-size:2.2rem;color:var(--acc);margin:0 0 4px">Album Kenangan Tamu</h2>
       <p style="font-size:.82rem;color:var(--mut);margin:0 0 12px" id="photoCountText">Memuat kenangan...</p>
       <div class="gallery-grid" id="galleryGrid"></div>
+      <div style="margin-top:16px">
+        <button class="btn" id="loadMoreBtn" style="display:none">Muat lebih banyak</button>
+      </div>
     </div>
   </section>
 </div>
@@ -405,7 +410,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-  import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
   // Konfigurasi Firebase Proyek moment-ab45b
   const CUSTOM_FIREBASE_CONFIG = {
@@ -490,31 +495,52 @@
   const ctx = canvas.getContext('2d');
   let stream = null;
   let facingMode = 'environment';
-  let currentFilter = 'natural';
+  let currentFilter = 'warm';
   let hasCaptured = false;
   let capturedDataUrl = '';
 
-  // css = pratinjau live; p = parameter pixel untuk hasil foto (konsisten di semua browser, termasuk iOS Safari)
+  // css = pratinjau live (perkiraan); p = parameter pixel untuk hasil foto (sama di semua browser, termasuk iOS Safari)
+  // c kontras, s saturasi, b kecerahan, r/g/bl warna, lift = hitam diangkat (kesan pudar),
+  // grain = bintik halus, vig = sudut menggelap, flash = tengah lebih terang (efek lampu flash)
   const FILTERS = {
-    natural: { css: 'contrast(1.05) saturate(1.08) brightness(1.02)', p: { c: 1.05, s: 1.08, b: 1.02, r: 1.0,  g: 1.0,  bl: 1.0 } },
-    warm:    { css: 'contrast(1.06) saturate(1.15) sepia(0.12) brightness(1.03)', p: { c: 1.06, s: 1.15, b: 1.03, r: 1.05, g: 1.01, bl: 0.92 } },
-    cool:    { css: 'contrast(1.06) saturate(1.1) hue-rotate(-8deg) brightness(1.03)', p: { c: 1.06, s: 1.10, b: 1.03, r: 0.95, g: 1.0,  bl: 1.06 } },
-    mono:    { css: 'grayscale(1) contrast(1.2) brightness(1.02)', p: { c: 1.2,  s: 0,    b: 1.02, r: 1.0,  g: 1.0,  bl: 1.0 } }
+    warm:    { css: 'contrast(1.08) saturate(1.2) sepia(0.14) brightness(1.04)',
+               p: { c: 1.08, s: 1.20, b: 1.04, r: 1.06, g: 1.01, bl: 0.90, lift: 8,  grain: 6,  vig: 0.16, flash: 0 } },
+    flash:   { css: 'contrast(1.18) saturate(1.05) brightness(1.08)',
+               p: { c: 1.18, s: 1.05, b: 1.06, r: 1.0,  g: 1.0,  bl: 0.97, lift: 6,  grain: 5,  vig: 0.24, flash: 0.20 } },
+    faded:   { css: 'contrast(0.95) saturate(0.85) brightness(1.06) hue-rotate(-6deg)',
+               p: { c: 0.95, s: 0.85, b: 1.04, r: 0.98, g: 1.03, bl: 1.02, lift: 24, grain: 8,  vig: 0.12, flash: 0 } },
+    blue:    { css: 'contrast(1.1) saturate(1.2) hue-rotate(-10deg) brightness(1.04)',
+               p: { c: 1.10, s: 1.20, b: 1.04, r: 0.92, g: 1.0,  bl: 1.08, lift: 6,  grain: 5,  vig: 0.16, flash: 0 } },
+    natural: { css: 'contrast(1.05) saturate(1.08) brightness(1.02)',
+               p: { c: 1.05, s: 1.08, b: 1.02, r: 1.0,  g: 1.0,  bl: 1.0,  lift: 0,  grain: 0,  vig: 0.10, flash: 0 } },
+    mono:    { css: 'grayscale(1) contrast(1.2) brightness(1.02)',
+               p: { c: 1.20, s: 0,    b: 1.02, r: 1.0,  g: 1.0,  bl: 1.0,  lift: 10, grain: 12, vig: 0.22, flash: 0 } }
   };
 
   function applyFilterPixels(c2d, w, h, p) {
     const img = c2d.getImageData(0, 0, w, h);
     const d = img.data;
-    for (let i = 0; i < d.length; i += 4) {
-      let r = d[i], g = d[i+1], b = d[i+2];
-      const l = 0.299*r + 0.587*g + 0.114*b;
-      r = l + (r - l) * p.s; g = l + (g - l) * p.s; b = l + (b - l) * p.s;
-      r = ((r - 128) * p.c + 128) * p.b * p.r;
-      g = ((g - 128) * p.c + 128) * p.b * p.g;
-      b = ((b - 128) * p.c + 128) * p.b * p.bl;
-      d[i]   = r < 0 ? 0 : r > 255 ? 255 : r;
-      d[i+1] = g < 0 ? 0 : g > 255 ? 255 : g;
-      d[i+2] = b < 0 ? 0 : b > 255 ? 255 : b;
+    const scale = (255 - p.lift) / 255;
+    const grainAmp = p.grain * 2;
+    for (let y = 0; y < h; y++) {
+      const dy = (y / h - 0.5) * 2;
+      for (let x = 0; x < w; x++) {
+        const dx = (x / w - 0.5) * 2;
+        const d2 = (dx * dx + dy * dy) / 2;               // 0 di tengah, 1 di sudut
+        const light = (1 - p.vig * d2) * (1 + p.flash * Math.max(0, 1 - d2 * 1.6));
+        const i = (y * w + x) * 4;
+        let r = d[i], g = d[i+1], b = d[i+2];
+        const l = 0.299*r + 0.587*g + 0.114*b;
+        r = l + (r - l) * p.s; g = l + (g - l) * p.s; b = l + (b - l) * p.s;
+        r = ((r - 128) * p.c + 128) * p.b * p.r * light;
+        g = ((g - 128) * p.c + 128) * p.b * p.g * light;
+        b = ((b - 128) * p.c + 128) * p.b * p.bl * light;
+        const n = grainAmp ? (Math.random() - 0.5) * grainAmp : 0;
+        r = p.lift + r * scale + n; g = p.lift + g * scale + n; b = p.lift + b * scale + n;
+        d[i]   = r < 0 ? 0 : r > 255 ? 255 : r;
+        d[i+1] = g < 0 ? 0 : g > 255 ? 255 : g;
+        d[i+2] = b < 0 ? 0 : b > 255 ? 255 : b;
+      }
     }
     c2d.putImageData(img, 0, 0);
   }
@@ -527,7 +553,7 @@
       video.style.filter = FILTERS[currentFilter].css;
     };
   });
-  video.style.filter = FILTERS.natural.css;
+  video.style.filter = FILTERS.warm.css;
 
   async function startCamera() {
     try {
@@ -603,13 +629,6 @@
     ctx.restore();
 
     applyFilterPixels(ctx, targetW, targetH, FILTERS[currentFilter].p);
-
-    // Vignette sangat tipis
-    const grad = ctx.createRadialGradient(targetW/2, targetH/2, targetW*0.45, targetW/2, targetH/2, targetW*0.85);
-    grad.addColorStop(0, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, 'rgba(20,18,12,0.14)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, targetW, targetH);
 
     capturedDataUrl = compressForFirestore();
     hasCaptured = true;
@@ -692,15 +711,33 @@
     document.getElementById('connDot').classList.add('live');
     document.getElementById('connText').textContent = 'Terhubung ke Album Live';
 
-    onSnapshot(photosRef, (snap) => {
+    listenPhotos();
+  });
+
+  // Muat bertahap: awalnya 30 foto terbaru, tombol "Muat lebih banyak" menambah 30 lagi
+  const PAGE_SIZE = 30;
+  let visibleLimit = PAGE_SIZE;
+  let unsubscribe = null;
+
+  function listenPhotos() {
+    if (unsubscribe) unsubscribe();
+    const q = query(photosRef, orderBy('createdAtMs', 'desc'), limit(visibleLimit));
+    unsubscribe = onSnapshot(q, (snap) => {
       const items = [];
       snap.forEach(d => items.push({ id: d.id, ...d.data() }));
-      items.sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
-      renderGallery(items);
+      renderGallery(items, snap.size >= visibleLimit);
     }, (err) => {
       document.getElementById('connText').textContent = 'Cek Rules Firestore (' + err.code + ')';
     });
-  });
+  }
+
+  document.getElementById('loadMoreBtn').onclick = () => {
+    const b = document.getElementById('loadMoreBtn');
+    b.disabled = true;
+    b.textContent = 'Memuat...';
+    visibleLimit += PAGE_SIZE;
+    listenPhotos();
+  };
 
   document.getElementById('uploadBtn').onclick = async () => {
     if (!capturedDataUrl || !currentUser) return;
@@ -737,10 +774,14 @@
     return String(str || '').replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
   }
 
-  function renderGallery(items) {
-    document.getElementById('navCount').textContent = items.length;
+  function renderGallery(items, hasMore) {
+    document.getElementById('navCount').textContent = items.length + (hasMore ? '+' : '');
+    const lm = document.getElementById('loadMoreBtn');
+    lm.style.display = hasMore ? 'inline-flex' : 'none';
+    lm.disabled = false;
+    lm.textContent = 'Muat lebih banyak';
     document.getElementById('photoCountText').textContent = items.length
-      ? `${items.length} momen terabadikan`
+      ? `${items.length}${hasMore ? '+' : ''} momen terabadikan`
       : 'Belum ada foto. Jadilah tamu pertama yang mengabadikan momen!';
 
     const grid = document.getElementById('galleryGrid');
