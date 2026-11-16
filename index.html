@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>GuestPOV Digicam • Dhani & Fitrah</title>
+<title>Kamera Tamu • Dhani & Fitrah</title>
 
 <!-- Open Graph Preview -->
-<meta name="description" content="Abadikan momen pernikahan Dhani & Fitrah dari sudut pandangmu dengan kamera digicam retro.">
+<meta name="description" content="Abadikan momen pernikahan Dhani & Fitrah dari sudut pandangmu.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="GuestPOV Digicam • Dhani & Fitrah">
-<meta property="og:description" content="Scan QR atau buka kamera untuk mengabadikan momen spesial Dhani & Fitrah secara langsung ke album bersama.">
+<meta property="og:title" content="Kamera Tamu • Dhani & Fitrah">
+<meta property="og:description" content="Ambil foto dan bagikan langsung ke album kenangan pernikahan Dhani & Fitrah.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -152,15 +152,8 @@
     box-shadow: 0 6px 18px rgba(99,99,66,0.06);
   }
   #qrcode img, #qrcode canvas { display: block; margin: 0 auto; border-radius: 6px; }
-  .room-pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: #F4F2EA; border: 1px solid #DFDCD0;
-    padding: 4px 14px; border-radius: 999px;
-    font-size: .78rem; color: var(--acc); font-weight: 600;
-    letter-spacing: .08em; margin-bottom: 6px;
-  }
 
-  /* Kamera Digicam */
+  /* Kamera */
   .cam-shell {
     position: relative;
     width: 100%;
@@ -204,7 +197,7 @@
     background: linear-gradient(160deg, #3A3A2B 0%, #26261C 100%);
   }
 
-  /* Filter Pills */
+  /* Filter */
   .filters {
     display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 10px;
     justify-content: center; flex-wrap: wrap;
@@ -328,10 +321,10 @@
       </svg>
     </div>
     <h1>DHANI &amp; FITRAH</h1>
-    <p>GuestPOV Disposable Digicam • 10.01.2027</p>
+    <p>Kamera Tamu &amp; Album Kenangan • 10.01.2027</p>
     <div class="status-bar">
-      <span class="dot" id="connDot"></span>
-      <span id="connText">Menghubungkan album...</span>
+      <span class="dot live"></span>
+      <span>Preview Mode Aktif</span>
     </div>
   </header>
 
@@ -341,29 +334,28 @@
       <svg class="sprig tl" viewBox="0 0 120 120" fill="none"><path d="M-4 68 C22 52, 46 34, 74 4" stroke="#7D8C57" stroke-width="1.2"/><ellipse cx="44" cy="30" rx="4" ry="9" transform="rotate(-35 44 30)" fill="#9CA876" opacity="0.7"/><ellipse cx="26" cy="46" rx="4" ry="9" transform="rotate(-55 26 46)" fill="#8A995C" opacity="0.65"/><circle cx="60" cy="16" r="3.5" fill="#E6C345" opacity="0.85"/></svg>
       <svg class="sprig br" viewBox="0 0 120 120" fill="none"><path d="M-4 68 C22 52, 46 34, 74 4" stroke="#7D8C57" stroke-width="1.2"/><ellipse cx="44" cy="30" rx="4" ry="9" transform="rotate(-35 44 30)" fill="#9CA876" opacity="0.7"/><ellipse cx="26" cy="46" rx="4" ry="9" transform="rotate(-55 26 46)" fill="#8A995C" opacity="0.65"/><circle cx="60" cy="16" r="3.5" fill="#E6C345" opacity="0.85"/></svg>
 
-      <span class="room-pill" id="roomBadge">ROOM: DHANI-FITRAH</span>
       <h2 class="script" style="font-size:2.3rem;color:var(--acc);margin:4px 0 6px">Abadikan Momen Kami</h2>
-      <p style="font-size:.86rem;color:var(--mut);margin:0 0 8px">Scan QR Code di bawah menggunakan kamera HP untuk memotret dengan filter digicam retro dan menyimpannya ke album pernikahan kami.</p>
+      <p style="font-size:.86rem;color:var(--mut);margin:0 0 16px">Scan QR Code di bawah menggunakan kamera HP untuk memotret dan membagikannya ke album pernikahan kami.</p>
 
       <div class="qr-frame">
         <div id="qrcode"></div>
       </div>
 
-      <p id="qrUrlLabel" style="font-size:.72rem;color:var(--mut);word-break:break-all;margin:4px 0 16px"></p>
+      <p id="qrUrlLabel" style="font-size:.72rem;color:var(--mut);word-break:break-all;margin:8px 0 16px"></p>
 
       <div style="display:flex;flex-direction:column;gap:8px;max-width:270px;margin:0 auto">
-        <button class="btn fill" onclick="switchTab('camera')">Buka Kamera Digicam</button>
-        <button class="btn" id="copyLinkBtn" style="font-size:.82rem;padding:9px 18px">Salin Link Kamera Tamu</button>
+        <button class="btn fill" onclick="switchTab('camera')">Buka Kamera</button>
+        <button class="btn" id="copyLinkBtn" style="font-size:.82rem;padding:9px 18px">Salin Link Utama</button>
       </div>
     </div>
   </section>
 
-  <!-- PANEL 2: KAMERA DIGICAM -->
+  <!-- PANEL 2: KAMERA -->
   <section id="panel-camera" class="panel">
     <div class="card" style="padding:20px 16px 22px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <span style="font-size:.78rem;color:var(--mut)">Halo, <strong id="guestDisplay" style="color:var(--acc)">Tamu Undangan</strong></span>
-        <span style="font-family:'Space Mono',monospace;font-size:.72rem;color:var(--acc)">CCD • 3.2MP</span>
+        <span style="font-family:'Space Mono',monospace;font-size:.72rem;color:var(--acc)">Kamera Tamu</span>
       </div>
 
       <div class="cam-shell">
@@ -372,14 +364,14 @@
 
         <div class="cam-hud">
           <div class="hud-top">
-            <span class="hud-tag" id="hudFilterName">CCD WARM</span>
-            <span class="hud-tag">FLASH AUTO</span>
+            <span class="hud-tag" id="hudFilterName">WARM VINTAGE</span>
+            <span class="hud-tag">READY</span>
           </div>
           <div class="hud-date" id="hudDate">'27 01 10</div>
         </div>
 
         <div class="cam-placeholder" id="camPlaceholder">
-          <p style="font-size:.92rem;margin:0 0 12px">Kamera digicam siap digunakan untuk mengabadikan momen.</p>
+          <p style="font-size:.92rem;margin:0 0 12px">Kamera siap digunakan untuk mengabadikan momen.</p>
           <button class="btn fill" id="startCamBtn" style="background:#FAF9F5;color:#4A4A38;border-color:#FAF9F5">Aktifkan Kamera</button>
           <label class="btn" style="margin-top:10px;font-size:.78rem;color:#FAF9F5;border-color:rgba(255,255,255,0.45);cursor:pointer">
             Atau Pilih Foto dari Galeri
@@ -388,12 +380,12 @@
         </div>
       </div>
 
-      <!-- Pilihan Filter Digicam -->
+      <!-- Pilihan Filter -->
       <div class="filters" id="filterBar">
-        <button class="flt on" data-filter="warm">CCD Warm</button>
-        <button class="flt" data-filter="cool">2004 Blue</button>
-        <button class="flt" data-filter="y2k">Y2K Party</button>
-        <button class="flt" data-filter="mono">Mono 400</button>
+        <button class="flt on" data-filter="warm">Warm Vintage</button>
+        <button class="flt" data-filter="cool">Soft Tone</button>
+        <button class="flt" data-filter="bright">Bright Natural</button>
+        <button class="flt" data-filter="mono">Classic B&W</button>
       </div>
 
       <!-- Kontrol Jepret -->
@@ -411,7 +403,7 @@
       <!-- Form Simpan Setelah Foto Diambil -->
       <div class="post-shot" id="postShotBox" style="display:none">
         <label for="senderName">Nama Kamu</label>
-        <input id="senderName" placeholder="Tulis namamu..." maxlength="36">
+        <input id="senderName" placeholder="Tulis namamu..." maxlength="36" value="Tamu Undangan">
         <label for="senderNote">Caption Singkat (Opsional)</label>
         <input id="senderNote" placeholder="Selamat menempuh hidup baru Dhani & Fitrah!" maxlength="90">
         <div style="display:flex;gap:8px;margin-top:6px">
@@ -438,28 +430,7 @@
   <button data-tab="album" onclick="switchTab('album')">Album (<span id="navCount">0</span>)</button>
 </nav>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-  import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-  // Konfigurasi Firebase Proyek moment-ab45b
-  const CUSTOM_FIREBASE_CONFIG = {
-    apiKey: "AIzaSyBc6L-QNgEp318uFVEr0qYPlpCJF2BjYKQ",
-    authDomain: "moment-ab45b.firebaseapp.com",
-    projectId: "moment-ab45b",
-    storageBucket: "moment-ab45b.firebasestorage.app",
-    messagingSenderId: "1012769282213",
-    appId: "1:1012769282213:web:c64c7802f15727fb19d54c",
-    measurementId: "G-BLBW3DY93T"
-  };
-
-  const firebaseConfig = (typeof __firebase_config !== 'undefined')
-    ? JSON.parse(__firebase_config)
-    : CUSTOM_FIREBASE_CONFIG;
-
-  const appId = (typeof __app_id !== 'undefined') ? __app_id : 'dhani-fitrah-wedding';
-
+<script>
   // Inisialisasi Kelopak Bunga Melayang
   (function initPetals() {
     const box = document.getElementById('petals');
@@ -475,24 +446,20 @@
     }
   })();
 
-  // Parameter URL (?room=... & ?to=... & ?mode=camera)
   const params = new URLSearchParams(location.search);
-  const roomCode = (params.get('room') || 'DHANI-FITRAH').toUpperCase().replace(/[^A-Z0-9-_]/g, '').slice(0, 24) || 'DHANI-FITRAH';
   const guestName = (params.get('to') || params.get('kepada') || '').trim().slice(0, 36);
 
-  document.getElementById('roomBadge').textContent = 'ROOM: ' + roomCode;
   if (guestName) {
     document.getElementById('guestDisplay').textContent = guestName;
     document.getElementById('senderName').value = guestName;
   }
 
-  // Generate QR Code mengarah langsung ke mode kamera
-  const baseUrl = location.origin + location.pathname;
-  const shareUrl = `${baseUrl}?room=${encodeURIComponent(roomCode)}&mode=camera`;
-  document.getElementById('qrUrlLabel').textContent = shareUrl;
+  // URL Bersih untuk QR Code (hanya domain utama tanpa parameter panjang)
+  const cleanBaseUrl = location.origin + location.pathname;
+  document.getElementById('qrUrlLabel').textContent = cleanBaseUrl;
 
   new QRCode(document.getElementById('qrcode'), {
-    text: shareUrl,
+    text: cleanBaseUrl,
     width: 196,
     height: 196,
     colorDark: "#4A4A38",
@@ -501,13 +468,13 @@
   });
 
   document.getElementById('copyLinkBtn').onclick = function() {
-    navigator.clipboard?.writeText(shareUrl).then(() => {
+    navigator.clipboard?.writeText(cleanBaseUrl).then(() => {
       this.textContent = 'Link Tersalin ✓';
-      setTimeout(() => { this.textContent = 'Salin Link Kamera Tamu'; }, 2200);
+      setTimeout(() => { this.textContent = 'Salin Link Utama'; }, 2200);
     });
   };
 
-  // Navigasi Tab
+  // Navigasi Tab & Auto-Redirect Pintar
   window.switchTab = function(tab) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
@@ -516,7 +483,7 @@
     if (tab === 'camera' && !stream && !hasCaptured) startCamera();
   };
 
-  if (params.get('mode') === 'camera') {
+  if (params.get('mode') === 'camera' || !location.search || location.search === '') {
     window.switchTab('camera');
   }
 
@@ -528,7 +495,7 @@
   const stampText = `'${yy} ${mm} ${dd}`;
   document.getElementById('hudDate').textContent = stampText;
 
-  // Logika Kamera & Filter Digicam
+  // Logika Kamera & Filter
   const video = document.getElementById('video');
   const canvas = document.getElementById('previewCanvas');
   const ctx = canvas.getContext('2d');
@@ -539,10 +506,10 @@
   let capturedDataUrl = '';
 
   const FILTERS = {
-    warm: { label: 'CCD WARM', css: 'contrast(1.08) saturate(1.22) sepia(0.18) brightness(1.03)' },
-    cool: { label: '2004 BLUE', css: 'contrast(1.12) saturate(1.15) hue-rotate(-10deg) brightness(1.04)' },
-    y2k:  { label: 'Y2K PARTY', css: 'contrast(1.22) saturate(1.38) brightness(1.06)' },
-    mono: { label: 'MONO 400', css: 'grayscale(1) contrast(1.25) brightness(1.02)' }
+    warm:   { label: 'WARM VINTAGE', css: 'contrast(1.08) saturate(1.2) sepia(0.15) brightness(1.02)' },
+    cool:   { label: 'SOFT TONE',    css: 'contrast(1.05) saturate(1.05) hue-rotate(-5deg) brightness(1.03)' },
+    bright: { label: 'NATURAL',      css: 'contrast(1.1) saturate(1.15) brightness(1.05)' },
+    mono:   { label: 'CLASSIC B&W',  css: 'grayscale(1) contrast(1.2) brightness(1.02)' }
   };
 
   document.querySelectorAll('.flt').forEach(btn => {
@@ -599,13 +566,14 @@
   }
 
   function renderDigicamFrame(sourceEl, isMirrored) {
-    const targetW = 720;
-    const targetH = 960;
+    // Ditingkatkan ke resolusi HD penuh agar hasil foto tajam dan tidak burik saat diunduh
+    const targetW = 1080;
+    const targetH = 1440;
     canvas.width = targetW;
     canvas.height = targetH;
 
-    const sw = sourceEl.videoWidth || sourceEl.naturalWidth || 720;
-    const sh = sourceEl.videoHeight || sourceEl.naturalHeight || 960;
+    const sw = sourceEl.videoWidth || sourceEl.naturalWidth || 1080;
+    const sh = sourceEl.videoHeight || sourceEl.naturalHeight || 1440;
     const targetRatio = targetW / targetH;
     const srcRatio = sw / sh;
 
@@ -627,21 +595,15 @@
     ctx.drawImage(sourceEl, sx, sy, sWidth, sHeight, 0, 0, targetW, targetH);
     ctx.restore();
 
-    // Vignette halus khas lensa digicam
-    const grad = ctx.createRadialGradient(targetW/2, targetH/2, targetW*0.32, targetW/2, targetH/2, targetW*0.78);
-    grad.addColorStop(0, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, 'rgba(20,18,12,0.28)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, targetW, targetH);
-
-    // Date stamp retro oranye
-    ctx.font = 'bold 26px "Space Mono", monospace';
+    // Date stamp oranye disesuaikan proporsinya untuk resolusi HD
+    ctx.font = 'bold 36px "Space Mono", monospace';
     ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    ctx.fillText(stampText, targetW - 182, targetH - 28);
+    ctx.fillText(stampText, targetW - 252, targetH - 38);
     ctx.fillStyle = '#FF8C24';
-    ctx.fillText(stampText, targetW - 184, targetH - 30);
+    ctx.fillText(stampText, targetW - 255, targetH - 40);
 
-    capturedDataUrl = canvas.toDataURL('image/jpeg', 0.78);
+    // Kualitas JPEG dinaikkan ke 90% (0.9) agar tetap jernih dan tajam
+    capturedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
     hasCaptured = true;
     video.style.display = 'none';
     canvas.style.display = 'block';
@@ -682,95 +644,54 @@
     if (!stream) startCamera();
   };
 
-  // Koneksi Firebase Firestore Real-Time
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  let currentUser = null;
+  // Simulasi Album Lokal untuk Preview di Sini
+  let localPhotos = [
+    { id: '1', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop', name: 'Keluarga Besar', note: 'Bahagia selalu untuk Dhani & Fitrah! ✨' },
+    { id: '2', image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&auto=format&fit=crop', name: 'Sahabat Kuliah', note: 'Akhirnya sah bestiekuu 🎉' }
+  ];
 
-  const photosRef = collection(db, 'artifacts', appId, 'public', 'data', `room_${roomCode}`);
-
-  signInAnonymously(auth).catch(err => {
-    document.getElementById('connText').textContent = 'Gagal koneksi auth: ' + err.code;
-  });
-
-  onAuthStateChanged(auth, (user) => {
-    if (!user) return;
-    currentUser = user;
-    document.getElementById('connDot').classList.add('live');
-    document.getElementById('connText').textContent = 'Terhubung ke Album Live';
-
-    onSnapshot(photosRef, (snap) => {
-      const items = [];
-      snap.forEach(d => items.push({ id: d.id, ...d.data() }));
-      items.sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
-      renderGallery(items);
-    }, (err) => {
-      document.getElementById('connText').textContent = 'Cek Rules Firestore (' + err.code + ')';
-    });
-  });
-
-  document.getElementById('uploadBtn').onclick = async () => {
-    if (!capturedDataUrl || !currentUser) return;
-    const btn = document.getElementById('uploadBtn');
-    const nameVal = document.getElementById('senderName').value.trim() || 'Tamu Undangan';
-    const noteVal = document.getElementById('senderNote').value.trim();
-
-    btn.disabled = true;
-    btn.textContent = 'Menyimpan...';
-
-    try {
-      await addDoc(photosRef, {
-        image: capturedDataUrl,
-        name: nameVal,
-        note: noteVal,
-        filter: currentFilter,
-        uid: currentUser.uid,
-        createdAt: serverTimestamp(),
-        createdAtMs: Date.now()
-      });
-      document.getElementById('senderNote').value = '';
-      document.getElementById('retakeBtn').click();
-      btn.disabled = false;
-      btn.textContent = 'Simpan ke Album';
-      switchTab('album');
-    } catch (err) {
-      alert('Gagal menyimpan foto: ' + err.message);
-      btn.disabled = false;
-      btn.textContent = 'Simpan ke Album';
-    }
-  };
-
-  function esc(str) {
-    return String(str || '').replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
-  }
-
-  function renderGallery(items) {
-    document.getElementById('navCount').textContent = items.length;
-    document.getElementById('photoCountText').textContent = items.length
-      ? `${items.length} momen terabadikan di room ${roomCode}`
-      : 'Belum ada foto. Jadilah tamu pertama yang mengabadikan momen!';
+  function renderGallery() {
+    document.getElementById('navCount').textContent = localPhotos.length;
+    document.getElementById('photoCountText').textContent = `${localPhotos.length} momen terabadikan dalam album bersama`;
 
     const grid = document.getElementById('galleryGrid');
-    grid.innerHTML = items.map(item => `
+    grid.innerHTML = localPhotos.map(item => `
       <div class="polaroid">
-        <img src="${item.image}" alt="Foto dari ${esc(item.name)}" loading="lazy">
-        <div class="cap">${esc(item.name)}</div>
-        ${item.note ? `<div class="msg">${esc(item.note)}</div>` : ''}
+        <img src="${item.image}" alt="Foto dari ${item.name}" loading="lazy">
+        <div class="cap">${item.name}</div>
+        ${item.note ? `<div class="msg">${item.note}</div>` : ''}
         <div class="act">
-          <a class="mini-link" href="${item.image}" download="DhaniFitrah-${item.id.slice(0,5)}.jpg">Unduh</a>
-          ${currentUser && item.uid === currentUser.uid
-            ? `<button class="mini-link" style="color:#A64B4B" onclick="deletePhoto('${item.id}')">Hapus</button>`
-            : ''}
+          <a class="mini-link" href="${item.image}" download="DhaniFitrah-${item.id}.jpg">Unduh</a>
+          <button class="mini-link" style="color:#A64B4B" onclick="deleteLocalPhoto('${item.id}')">Hapus</button>
         </div>
       </div>
     `).join('');
   }
 
-  window.deletePhoto = async function(id) {
-    if (!confirm('Hapus foto ini dari album?')) return;
-    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `room_${roomCode}`, id));
+  document.getElementById('uploadBtn').onclick = () => {
+    if (!capturedDataUrl) return;
+    const nameVal = document.getElementById('senderName').value.trim() || 'Tamu Undangan';
+    const noteVal = document.getElementById('senderNote').value.trim();
+
+    localPhotos.unshift({
+      id: String(Date.now()),
+      image: capturedDataUrl,
+      name: nameVal,
+      note: noteVal
+    });
+
+    document.getElementById('senderNote').value = '';
+    document.getElementById('retakeBtn').click();
+    renderGallery();
+    switchTab('album');
   };
+
+  window.deleteLocalPhoto = function(id) {
+    localPhotos = localPhotos.filter(p => p.id !== id);
+    renderGallery();
+  };
+
+  renderGallery();
 </script>
 </body>
 </html>
