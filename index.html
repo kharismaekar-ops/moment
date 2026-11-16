@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
   :root {
@@ -70,8 +71,6 @@
 
   /* Header Monogram */
   header { text-align: center; padding: 8px 0 18px; }
-  .monogram { width: 78px; margin: 0 auto 4px; }
-  .monogram svg { width: 100%; height: auto; display: block; }
   header h1 {
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 1.45rem;
@@ -134,7 +133,7 @@
     transition: background .2s, color .2s, transform .12s;
   }
   .btn:active { transform: scale(0.98); }
-  .btn.fill { background: var(--acc); color: #fff; }
+  .btn.fill { background: var(--acc); color: #fff; box-shadow: 0 4px 12px rgba(99, 99, 66, 0.18); }
   .btn.fill:hover { background: #4E4E34; }
   .btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
@@ -145,6 +144,7 @@
 
   /* QR Box */
   .qr-frame {
+    position: relative;
     display: inline-block;
     padding: 16px;
     background: #FFFFFF;
@@ -152,13 +152,17 @@
     border-radius: 18px;
     margin: 14px auto;
     box-shadow: 0 6px 18px rgba(99,99,66,0.06);
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
   }
+  .qr-frame:hover { box-shadow: 0 8px 22px rgba(99,99,66,0.12); }
+  .qr-frame:active { transform: scale(0.97); }
   #qrcode img, #qrcode canvas { display: block; margin: 0 auto; border-radius: 6px; }
 
   /* Kamera */
   .cam-shell {
     position: relative;
-    width: min(100%, max(220px, calc((100svh - 410px) * 0.75)));
+    width: min(100%, max(200px, calc((100svh - 480px) * 0.75)));
     aspect-ratio: 3 / 4;
     margin-left: auto; margin-right: auto;
     background: #23231B;
@@ -242,11 +246,61 @@
   .polaroid img {
     width: 100%; aspect-ratio: 3 / 4; object-fit: cover;
     border-radius: 9px; display: block; background: #EFECE3;
+    cursor: zoom-in;
   }
   .polaroid .cap { margin-top: 8px; font-size: .8rem; font-weight: 600; color: var(--acc); line-height: 1.3; }
   .polaroid .msg { font-size: .74rem; color: var(--mut); margin-top: 2px; line-height: 1.35; }
-  .polaroid .act { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 6px; border-top: 1px dashed #E6E4DA; }
+  .polaroid .act { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #E6E4DA; }
   .mini-link { font-size: .72rem; color: var(--acc); background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; font-family: inherit; }
+  .dl-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--acc); color: #FFFFFF;
+    padding: 5px 11px; border-radius: 999px;
+    font-size: .72rem; font-weight: 500;
+    text-decoration: none; border: none; cursor: pointer;
+    box-shadow: 0 2px 6px rgba(99,99,66,0.22);
+    transition: background .15s, transform .1s;
+  }
+  .dl-pill:hover { background: #4E4E34; }
+  .dl-pill:active { transform: scale(0.95); }
+
+  /* Antrian foto sebelum disimpan */
+  .qstrip { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: none; }
+  .qstrip::-webkit-scrollbar { display: none; }
+  .qthumb { position: relative; flex: none; width: 54px; height: 72px; }
+  .qthumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid #D5D2C2; display: block; }
+  .qthumb button {
+    position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; border-radius: 50%;
+    border: none; background: #4A4A38; color: #fff; font-size: .8rem; line-height: 1; cursor: pointer; padding: 0;
+  }
+
+  /* Caption per foto */
+  .crow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .crow .qthumb { width: 54px; height: 72px; flex: none; }
+  .crow input { flex: 1; width: auto; margin: 0; padding: 9px 12px; font-size: .84rem; min-width: 0; }
+  .crow .crm {
+    flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1px solid #D5D2C2;
+    background: #FAF9F5; color: var(--ink); font-size: 1rem; line-height: 1; cursor: pointer; padding: 0;
+  }
+  .albumnote { grid-column: 1 / -1; text-align: left; font-size: .8rem; color: var(--mut); font-style: italic; line-height: 1.45; }
+
+  /* Overlay antrian di dalam kamera */
+  .q-overlay { position: absolute; inset: 0; pointer-events: none; }
+  .q-overlay .qstrip {
+    position: absolute; left: 8px; right: 8px; bottom: 8px; pointer-events: auto;
+    background: rgba(35,35,27,0.38); border-radius: 12px; padding: 7px 6px 5px;
+  }
+  .q-overlay .qthumb { width: 38px; height: 50px; }
+  .q-overlay .qthumb img { border-color: rgba(255,255,255,0.7); }
+
+  /* Folder tamu di album */
+  .folder { width: 100%; font-family: inherit; cursor: pointer; }
+  .fcover { position: relative; }
+  .fbadge {
+    position: absolute; right: 7px; bottom: 7px;
+    background: rgba(35,35,27,0.72); color: #fff; font-size: .7rem;
+    padding: 2px 9px; border-radius: 999px;
+  }
 
   /* Navigasi Bawah Melayang */
   nav.bottom-nav {
@@ -279,12 +333,75 @@
     transition: opacity .35s ease-out;
   }
   .flash-fx.bang { opacity: 0.92; transition: none; }
+
+  /* Toast & Modal Custom (pengganti alert/confirm) */
+  .toast-msg {
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-16px);
+    background: #4A4A38; color: #FFFFFF; padding: 10px 18px; border-radius: 999px;
+    font-size: .8rem; z-index: 120; opacity: 0; pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2); transition: opacity .25s, transform .25s;
+    max-width: 90vw; text-align: center;
+  }
+  .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(26, 26, 20, 0.72);
+    backdrop-filter: blur(4px); z-index: 110; display: none;
+    align-items: center; justify-content: center; padding: 18px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-box {
+    background: #FAF9F4; border: 1.5px solid #D5D2C2; border-radius: 22px;
+    padding: 24px 20px; max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.25);
+  }
+  .lb-box {
+    background: #FFFFFF; border-radius: 20px; padding: 12px 12px 16px;
+    max-width: 420px; width: 100%; text-align: left; position: relative;
+    box-shadow: 0 18px 44px rgba(0,0,0,0.35);
+  }
+  .lb-box img { width: 100%; max-height: 68svh; object-fit: contain; border-radius: 12px; background: #23231B; display: block; }
+  .lb-close {
+    position: absolute; top: 18px; right: 18px; width: 34px; height: 34px;
+    border-radius: 50%; border: none; background: rgba(35,35,27,0.75);
+    color: #fff; font-size: 1.2rem; cursor: pointer; line-height: 1;
+  }
 </style>
 </head>
 <body>
 
 <div class="flash-fx" id="flashFx"></div>
 <div class="petals" id="petals" aria-hidden="true"></div>
+<div class="toast-msg" id="toastMsg"></div>
+
+<!-- Modal Konfirmasi -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal-box">
+    <p id="confirmText" style="font-size:.9rem;margin:0 0 18px;color:var(--ink)">Hapus foto ini?</p>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="confirmCancel" style="flex:1;padding:9px">Batal</button>
+      <button class="btn fill" id="confirmOk" style="flex:1;padding:9px;background:#A64B4B;border-color:#A64B4B">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Lightbox Foto -->
+<div class="modal-backdrop" id="lightboxModal">
+  <div class="lb-box">
+    <button class="lb-close" id="lbClose" aria-label="Tutup">&times;</button>
+    <img id="lbImg" src="" alt="Preview Foto">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-top:12px;gap:10px">
+      <div>
+        <div id="lbName" style="font-weight:600;font-size:.92rem;color:var(--acc)"></div>
+        <div id="lbNote" style="font-size:.8rem;color:var(--mut);margin-top:2px"></div>
+      </div>
+      <a class="btn fill" id="lbDownload" href="#" download="DhaniFitrah.jpg" style="padding:8px 16px;font-size:.8rem;flex-shrink:0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Unduh Foto
+      </a>
+    </div>
+  </div>
+</div>
 
 <div class="wrap">
   <header>
@@ -305,7 +422,7 @@
       <h2 class="script" style="font-size:2.3rem;color:var(--acc);margin:4px 0 6px">Abadikan Momen Kami</h2>
       <p style="font-size:.86rem;color:var(--mut);margin:0 0 8px">Scan QR Code di bawah menggunakan kamera HP untuk memotret dan menyimpannya ke album pernikahan kami.</p>
 
-      <div class="qr-frame">
+      <div class="qr-frame" id="qrBoxTrigger" title="Ketuk QR Code untuk mengunduh kartu siap cetak" role="button" tabindex="0">
         <div id="qrcode"></div>
       </div>
 
@@ -322,57 +439,77 @@
   <section id="panel-camera" class="panel">
     <div class="card" style="padding:20px 16px 22px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="font-size:.78rem;color:var(--mut)">Halo, <strong id="guestDisplay" style="color:var(--acc)">Tamu Undangan</strong></span>
-        
+        <span style="font-size:.78rem;color:var(--mut)">Halo, <strong id="guestDisplay" style="color:var(--acc)">Tamu Undangan</strong> <button class="mini-link" id="changeNameBtn" style="margin-left:4px">ganti</button></span>
       </div>
 
-      <div class="cam-shell">
-        <video id="video" playsinline autoplay muted></video>
-        <canvas id="previewCanvas"></canvas>
+      <!-- Isi nama sekali di awal -->
+      <div id="nameGate" style="display:none;padding:18px 4px 8px;text-align:center">
+        <h2 class="script" style="font-size:2.1rem;color:var(--acc);margin:0 0 6px">Siapa namamu?</h2>
+        <p style="font-size:.84rem;color:var(--mut);margin:0 0 14px">Cukup isi sekali. Nama ini akan tampil di semua fotomu.</p>
+        <input id="gateName" placeholder="Tulis namamu..." maxlength="36" autocomplete="name"
+               style="width:100%;padding:11px 14px;margin-bottom:12px;border:1px solid #D5D2C2;border-radius:12px;background:#fff;color:var(--ink);font:400 .95rem 'Noto Serif',serif;text-align:center">
+        <button class="btn fill" id="gateBtn" style="width:100%">Mulai Memotret</button>
+      </div>
 
-        <div class="cam-placeholder" id="camPlaceholder">
-          <p style="font-size:.92rem;margin:0 0 12px">Kamera siap digunakan untuk mengabadikan momen.</p>
-          <button class="btn fill" id="startCamBtn" style="background:#FAF9F5;color:#4A4A38;border-color:#FAF9F5">Aktifkan Kamera</button>
-          <label class="btn" style="margin-top:10px;font-size:.78rem;color:#FAF9F5;border-color:rgba(255,255,255,0.45);cursor:pointer">
-            Atau Pilih Foto dari Galeri
-            <input type="file" id="fileInput" accept="image/*" hidden>
+      <div id="camArea">
+        <div class="cam-shell">
+          <video id="video" playsinline autoplay muted></video>
+          <canvas id="previewCanvas"></canvas>
+
+          <div class="cam-placeholder" id="camPlaceholder">
+            <p style="font-size:.92rem;margin:0 0 12px">Kamera siap digunakan untuk mengabadikan momen.</p>
+            <button class="btn fill" id="startCamBtn" style="background:#FAF9F5;color:#4A4A38;border-color:#FAF9F5">Aktifkan Kamera</button>
+            <label class="btn" style="margin-top:10px;font-size:.78rem;color:#FAF9F5;border-color:rgba(255,255,255,0.45);cursor:pointer">
+              Atau Pilih Foto dari Galeri
+              <input type="file" id="fileInput" accept="image/*" multiple hidden>
+            </label>
+          </div>
+
+          <!-- Gambar kecil foto yang sudah dijepret -->
+          <div class="q-overlay" id="queueOverlay" style="display:none">
+            <div class="qstrip" id="queueStrip"></div>
+          </div>
+        </div>
+
+        <!-- Pilihan Filter -->
+        <div class="filters" id="filterBar">
+          <button class="flt on" data-filter="warm">Hangat</button>
+          <button class="flt" data-filter="flash">Flash</button>
+          <button class="flt" data-filter="faded">Pudar</button>
+          <button class="flt" data-filter="blue">Biru</button>
+          <button class="flt" data-filter="natural">Natural</button>
+          <button class="flt" data-filter="mono">Hitam Putih</button>
+        </div>
+
+        <!-- Kontrol Jepret -->
+        <div class="cam-controls" id="liveControls">
+          <label class="icon-btn" title="Pilih dari galeri" style="cursor:pointer">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <input type="file" id="fileInput2" accept="image/*" multiple hidden>
           </label>
+          <button class="shutter" id="shutterBtn" aria-label="Ambil Foto"><span></span></button>
+          <button class="icon-btn" id="flipCamBtn" title="Ganti Kamera Depan/Belakang">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>
+          </button>
         </div>
-      </div>
 
-      <!-- Pilihan Filter -->
-      <div class="filters" id="filterBar">
-        <button class="flt on" data-filter="warm">Hangat</button>
-        <button class="flt" data-filter="flash">Flash</button>
-        <button class="flt" data-filter="faded">Pudar</button>
-        <button class="flt" data-filter="blue">Biru</button>
-        <button class="flt" data-filter="natural">Natural</button>
-        <button class="flt" data-filter="mono">Hitam Putih</button>
-      </div>
-
-      <!-- Kontrol Jepret -->
-      <div class="cam-controls" id="liveControls">
-        <label class="icon-btn" title="Pilih dari galeri" style="cursor:pointer">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <input type="file" id="fileInput2" accept="image/*" hidden>
-        </label>
-        <button class="shutter" id="shutterBtn" aria-label="Ambil Foto"><span></span></button>
-        <button class="icon-btn" id="flipCamBtn" title="Ganti Kamera Depan/Belakang">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>
-        </button>
-      </div>
-
-      <!-- Form Simpan Setelah Foto Diambil -->
-      <div class="post-shot" id="postShotBox" style="display:none">
-        <label for="senderName">Nama Kamu</label>
-        <input id="senderName" placeholder="Tulis namamu..." maxlength="36">
-        <label for="senderNote">Caption Singkat (Opsional)</label>
-        <input id="senderNote" placeholder="Selamat menempuh hidup baru Dhani & Fitrah!" maxlength="90">
-        <div style="display:flex;gap:8px;margin-top:6px">
-          <button class="btn" id="retakeBtn" style="flex:1">Ulangi</button>
-          <button class="btn fill" id="uploadBtn" style="flex:2">Simpan ke Album</button>
+        <!-- Tombol selesai -->
+        <div id="queueBar" style="margin-top:12px">
+          <button class="btn fill" id="doneBtn" style="width:100%;padding:9px 18px" disabled>Selesai &middot; <span id="quotaText">0/20</span></button>
+          <div id="unsavedNote" style="visibility:hidden;font-size:.7rem;color:var(--mut);text-align:center;margin-top:5px">Foto belum tersimpan sampai kamu menekan Selesai, lalu Simpan.</div>
         </div>
-      </div>
+
+        <!-- Form Caption (sekali untuk semua foto) -->
+        <div class="post-shot" id="postShotBox" style="display:none">
+          <div id="captionList"></div>
+          <label for="senderNote" style="margin-top:4px">Caption album (Opsional)</label>
+          <input id="senderNote" placeholder="Tulis kesan atau ucapan untuk albummu..." maxlength="90">
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button class="btn" id="backBtn" style="flex:1">Tambah Foto</button>
+            <button class="btn fill" id="uploadBtn" style="flex:2">Simpan ke Album</button>
+          </div>
+        </div>
+      </div><!-- /camArea -->
     </div>
   </section>
 
@@ -380,7 +517,18 @@
   <section id="panel-album" class="panel">
     <div class="card" style="padding:24px 16px">
       <h2 class="script" style="font-size:2.2rem;color:var(--acc);margin:0 0 4px">Album Kenangan Tamu</h2>
-      <p style="font-size:.82rem;color:var(--mut);margin:0 0 12px" id="photoCountText">Memuat kenangan...</p>
+      <p style="font-size:.82rem;color:var(--mut);margin:0 0 10px" id="photoCountText">Memuat kenangan...</p>
+
+      <div style="margin-bottom:10px">
+        <button class="btn fill" id="downloadZipBtn" style="display:none;font-size:.82rem;padding:10px 20px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span id="downloadZipText">Unduh Semua Foto (ZIP)</span>
+        </button>
+      </div>
+
+      <div id="albumBack" style="display:none;text-align:left;margin-bottom:2px">
+        <button class="mini-link" id="albumBackBtn" style="font-size:.82rem">&larr; Semua tamu</button>
+      </div>
       <div class="gallery-grid" id="galleryGrid"></div>
       <div style="margin-top:16px">
         <button class="btn" id="loadMoreBtn" style="display:none">Muat lebih banyak</button>
@@ -398,7 +546,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-  import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, orderBy, limit, where, getCountFromServer, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
   // Konfigurasi Firebase Proyek moment-ab45b
   const CUSTOM_FIREBASE_CONFIG = {
@@ -432,22 +580,50 @@
     }
   })();
 
-  // Parameter URL (?room=... & ?to=... & ?mode=camera)
+  // Parameter URL (?room=... & ?to=... & ?admin=1)
   const params = new URLSearchParams(location.search);
   const roomCode = (params.get('room') || 'DHANI-FITRAH').toUpperCase().replace(/[^A-Z0-9-_]/g, '').slice(0, 24) || 'DHANI-FITRAH';
   const guestName = (params.get('to') || params.get('kepada') || '').trim().slice(0, 36);
+  const isAdmin = params.get('admin') === '1';
 
-    if (guestName) {
-    document.getElementById('guestDisplay').textContent = guestName;
-    document.getElementById('senderName').value = guestName;
+  function showToast(msg) {
+    const t = document.getElementById('toastMsg');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => t.classList.remove('show'), 2800);
   }
 
-  // Generate QR Code mengarah langsung ke mode kamera
-  const baseUrl = location.origin + location.pathname;
-  const shareUrl = `${baseUrl}?room=${encodeURIComponent(roomCode)}&mode=camera`;
-  
+  function showConfirm(msg) {
+    return new Promise(resolve => {
+      const modal = document.getElementById('confirmModal');
+      document.getElementById('confirmText').textContent = msg;
+      modal.classList.add('open');
+      const cleanup = (res) => { modal.classList.remove('open'); resolve(res); };
+      document.getElementById('confirmOk').onclick = () => cleanup(true);
+      document.getElementById('confirmCancel').onclick = () => cleanup(false);
+    });
+  }
+
+  // Nama tamu: dari link (?to=) atau yang tersimpan di perangkat ini
+  let guestNameValue = guestName;
+  if (!guestNameValue) {
+    try { guestNameValue = (localStorage.getItem('guestName') || '').slice(0, 36); } catch (e) {}
+  }
+  function applyGuestName() {
+    const has = !!guestNameValue;
+    document.getElementById('guestDisplay').textContent = guestNameValue || 'Tamu Undangan';
+    document.getElementById('nameGate').style.display = has ? 'none' : 'block';
+    document.getElementById('camArea').style.display = has ? 'block' : 'none';
+    document.getElementById('changeNameBtn').style.display = has ? 'inline' : 'none';
+  }
+  applyGuestName();
+
+  // Generate QR Code dengan URL bersih (tanpa query panjang agar QR renggang & cepat di-scan)
+  const cleanBaseUrl = location.origin + location.pathname;
+
   new QRCode(document.getElementById('qrcode'), {
-    text: shareUrl,
+    text: cleanBaseUrl,
     width: 196,
     height: 196,
     colorDark: "#4A4A38",
@@ -455,11 +631,104 @@
     correctLevel: QRCode.CorrectLevel.M
   });
 
+  // Unduh Kartu QR Siap Cetak saat kotak QR ditekan
+  document.getElementById('qrBoxTrigger').onclick = async function() {
+    const qrSource = document.querySelector('#qrcode canvas') || document.querySelector('#qrcode img');
+    if (!qrSource) { showToast('QR Code belum siap.'); return; }
+
+    try {
+      await Promise.all([
+        document.fonts.load('600 54px "Cormorant Garamond"'),
+        document.fonts.load('400 78px "Alex Brush"'),
+        document.fonts.load('400 32px "Noto Serif"'),
+        document.fonts.load('400 22px "Space Mono"')
+      ]);
+    } catch (e) {}
+
+    const c = document.createElement('canvas');
+    c.width = 1200;
+    c.height = 1600;
+    const g = c.getContext('2d');
+
+    g.fillStyle = '#F6F5EF';
+    g.fillRect(0, 0, c.width, c.height);
+
+    g.strokeStyle = '#636342';
+    g.lineWidth = 4;
+    g.strokeRect(56, 56, c.width - 112, c.height - 112);
+
+    g.strokeStyle = '#C8C4B0';
+    g.lineWidth = 2;
+    g.strokeRect(76, 76, c.width - 152, c.height - 152);
+
+    g.fillStyle = '#5B5B3B';
+    g.font = '600 54px "Cormorant Garamond", Georgia, serif';
+    g.textAlign = 'center';
+    g.fillText('DHANI & FITRAH', c.width / 2, 200);
+
+    g.fillStyle = '#75755E';
+    g.font = '400 30px "Noto Serif", Georgia, serif';
+    g.fillText('10 . 01 . 2027', c.width / 2, 255);
+
+    g.fillStyle = '#636342';
+    g.font = '400 78px "Alex Brush", cursive';
+    g.fillText('Abadikan Momen Kami', c.width / 2, 375);
+
+    const boxSize = 580;
+    const boxX = (c.width - boxSize) / 2;
+    const boxY = 445;
+    g.fillStyle = '#FFFFFF';
+    g.beginPath();
+    g.roundRect(boxX, boxY, boxSize, boxSize, 36);
+    g.fill();
+    g.strokeStyle = '#C8C4B0';
+    g.lineWidth = 3;
+    g.stroke();
+
+    const qrPad = 48;
+    g.drawImage(qrSource, boxX + qrPad, boxY + qrPad, boxSize - qrPad * 2, boxSize - qrPad * 2);
+
+    const maxTextW = c.width - 220;
+    g.fillStyle = '#4A4A38';
+    g.font = '600 32px "Noto Serif", Georgia, serif';
+    g.fillText('SCAN QR CODE INI', c.width / 2, 1135, maxTextW);
+
+    g.fillStyle = '#75755E';
+    g.font = '400 26px "Noto Serif", Georgia, serif';
+    g.fillText('Arahkan kamera HP ke QR Code di atas', c.width / 2, 1190, maxTextW);
+    g.fillText('untuk membagikan foto ke album kami.', c.width / 2, 1232, maxTextW);
+
+    const displayUrl = (location.hostname && !location.hostname.includes('usercontent') && !location.hostname.includes('localhost'))
+      ? (location.hostname + location.pathname).replace(/\/$/, '')
+      : 'kharismaekar-ops.github.io/moment';
+    g.fillStyle = '#8F8956';
+    g.font = '400 22px "Space Mono", monospace';
+    g.fillText(displayUrl, c.width / 2, 1380, maxTextW);
+
+    const a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = 'Kartu-QR-Dhani-Fitrah.png';
+    a.click();
+    showToast('Kartu QR siap cetak berhasil diunduh!');
+  };
+
   document.getElementById('copyLinkBtn').onclick = function() {
-    navigator.clipboard?.writeText(shareUrl).then(() => {
+    const copyDone = () => {
       this.textContent = 'Link Tersalin ✓';
+      showToast('Link utama berhasil disalin');
       setTimeout(() => { this.textContent = 'Salin Link'; }, 2200);
-    });
+    };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(cleanBaseUrl).then(copyDone);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = cleanBaseUrl;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      copyDone();
+    }
   };
 
   // Navigasi Tab
@@ -469,14 +738,8 @@
     document.getElementById('panel-' + tab).classList.add('active');
     document.body.classList.toggle('cam-mode', tab === 'camera');
     document.querySelector(`.bottom-nav button[data-tab="${tab}"]`).classList.add('active');
-    if (tab === 'camera' && !stream && !hasCaptured) startCamera();
+    if (tab === 'camera' && guestNameValue && !stream) startCamera();
   };
-
-  if (params.get('mode') === 'camera') {
-    window.switchTab('camera');
-  }
-
-  // (tanggal HUD dihapus)
 
   // Logika Kamera & Filter
   const video = document.getElementById('video');
@@ -485,25 +748,21 @@
   let stream = null;
   let facingMode = 'environment';
   let currentFilter = 'warm';
-  let hasCaptured = false;
-  let capturedDataUrl = '';
+  const queue = [];
 
-  // css = pratinjau live (perkiraan); p = parameter pixel untuk hasil foto (sama di semua browser, termasuk iOS Safari)
-  // c kontras, s saturasi, b kecerahan, r/g/bl warna, lift = hitam diangkat (kesan pudar),
-  // grain = bintik halus, vig = sudut menggelap, flash = tengah lebih terang (efek lampu flash)
   const FILTERS = {
     warm:    { css: 'contrast(1.08) saturate(1.2) sepia(0.14) brightness(1.04)',
-               p: { c: 1.08, s: 1.20, b: 1.04, r: 1.06, g: 1.01, bl: 0.90, lift: 8,  grain: 6,  vig: 0.16, flash: 0 } },
+               p: { c: 1.08, s: 1.20, b: 1.04, r: 1.06, g: 1.01, bl: 0.90, lift: 8,  grain: 4.8,  vig: 0.16, flash: 0 } },
     flash:   { css: 'contrast(1.18) saturate(1.05) brightness(1.08)',
-               p: { c: 1.18, s: 1.05, b: 1.06, r: 1.0,  g: 1.0,  bl: 0.97, lift: 6,  grain: 5,  vig: 0.24, flash: 0.20 } },
+               p: { c: 1.18, s: 1.05, b: 1.06, r: 1.0,  g: 1.0,  bl: 0.97, lift: 6,  grain: 4.0,  vig: 0.24, flash: 0.20 } },
     faded:   { css: 'contrast(0.95) saturate(0.85) brightness(1.06) hue-rotate(-6deg)',
-               p: { c: 0.95, s: 0.85, b: 1.04, r: 0.98, g: 1.03, bl: 1.02, lift: 24, grain: 8,  vig: 0.12, flash: 0 } },
+               p: { c: 0.95, s: 0.85, b: 1.04, r: 0.98, g: 1.03, bl: 1.02, lift: 24, grain: 6.4,  vig: 0.12, flash: 0 } },
     blue:    { css: 'contrast(1.1) saturate(1.2) hue-rotate(-10deg) brightness(1.04)',
-               p: { c: 1.10, s: 1.20, b: 1.04, r: 0.92, g: 1.0,  bl: 1.08, lift: 6,  grain: 5,  vig: 0.16, flash: 0 } },
+               p: { c: 1.10, s: 1.20, b: 1.04, r: 0.92, g: 1.0,  bl: 1.08, lift: 6,  grain: 4.0,  vig: 0.16, flash: 0 } },
     natural: { css: 'contrast(1.05) saturate(1.08) brightness(1.02)',
-               p: { c: 1.05, s: 1.08, b: 1.02, r: 1.0,  g: 1.0,  bl: 1.0,  lift: 0,  grain: 0,  vig: 0.10, flash: 0 } },
+               p: { c: 1.05, s: 1.08, b: 1.02, r: 1.0,  g: 1.0,  bl: 1.0,  lift: 0,  grain: 0.0,  vig: 0.10, flash: 0 } },
     mono:    { css: 'grayscale(1) contrast(1.2) brightness(1.02)',
-               p: { c: 1.20, s: 0,    b: 1.02, r: 1.0,  g: 1.0,  bl: 1.0,  lift: 10, grain: 12, vig: 0.22, flash: 0 } }
+               p: { c: 1.20, s: 0,    b: 1.02, r: 1.0,  g: 1.0,  bl: 1.0,  lift: 10, grain: 9.6, vig: 0.22, flash: 0 } }
   };
 
   function applyFilterPixels(c2d, w, h, p) {
@@ -515,7 +774,7 @@
       const dy = (y / h - 0.5) * 2;
       for (let x = 0; x < w; x++) {
         const dx = (x / w - 0.5) * 2;
-        const d2 = (dx * dx + dy * dy) / 2;               // 0 di tengah, 1 di sudut
+        const d2 = (dx * dx + dy * dy) / 2;
         const light = (1 - p.vig * d2) * (1 + p.flash * Math.max(0, 1 - d2 * 1.6));
         const i = (y * w + x) * 4;
         let r = d[i], g = d[i+1], b = d[i+2];
@@ -590,7 +849,6 @@
     const sw = sourceEl.videoWidth || sourceEl.naturalWidth || 1080;
     const sh = sourceEl.videoHeight || sourceEl.naturalHeight || 1440;
 
-    // Rasio 3:4, resolusi mengikuti sumber (maks 1080x1440) supaya tidak pecah
     const targetRatio = 3 / 4;
     const srcRatio = sw / sh;
     let sx = 0, sy = 0, sWidth = sw, sHeight = sh;
@@ -619,16 +877,77 @@
 
     applyFilterPixels(ctx, targetW, targetH, FILTERS[currentFilter].p);
 
-    capturedDataUrl = compressForFirestore();
-    hasCaptured = true;
-    video.style.display = 'none';
-    canvas.style.display = 'block';
-    document.getElementById('liveControls').style.display = 'none';
-    document.getElementById('filterBar').style.display = 'none';
-    document.getElementById('postShotBox').style.display = 'block';
+    queue.push({ url: compressForFirestore(), filter: currentFilter, note: '' });
+    updateQueueUI();
+    updateQuotaText();
   }
 
-  // Firestore membatasi dokumen ~1 MB: turunkan kualitas bertahap, lalu perkecil ukuran bila perlu
+  // ---- Tampilan antrian & caption ----
+  function thumbsHtml() {
+    return queue.map((q, i) => `<div class="qthumb"><img src="${q.url}" alt=""><button data-i="${i}" aria-label="Hapus foto">&times;</button></div>`).join('');
+  }
+  function bindThumbRemove(box) {
+    box.querySelectorAll('button[data-i]').forEach(b => {
+      b.onclick = () => {
+        queue.splice(Number(b.dataset.i), 1);
+        updateQuotaText();
+        if (!queue.length) showShooting(); else { updateQueueUI(); if (captionMode) showCaption(); }
+      };
+    });
+  }
+  let captionMode = false;
+  function updateQueueUI() {
+    const strip = document.getElementById('queueStrip');
+    strip.innerHTML = thumbsHtml();
+    bindThumbRemove(strip);
+    strip.scrollLeft = strip.scrollWidth;
+    document.getElementById('queueOverlay').style.display = (queue.length && !captionMode) ? 'block' : 'none';
+    document.getElementById('doneBtn').disabled = !queue.length;
+    document.getElementById('unsavedNote').style.visibility = queue.length ? 'visible' : 'hidden';
+  }
+  function showShooting() {
+    captionMode = false;
+    document.querySelector('.cam-shell').style.display = '';
+    document.getElementById('filterBar').style.display = 'grid';
+    document.getElementById('liveControls').style.display = 'flex';
+    document.getElementById('postShotBox').style.display = 'none';
+    document.getElementById('queueBar').style.display = 'block';
+    updateQueueUI();
+    if (!stream) startCamera();
+  }
+  function showCaption() {
+    captionMode = true;
+    document.querySelector('.cam-shell').style.display = 'none';
+    document.getElementById('filterBar').style.display = 'none';
+    document.getElementById('liveControls').style.display = 'none';
+    document.getElementById('queueBar').style.display = 'none';
+    document.getElementById('queueOverlay').style.display = 'none';
+    const rv = document.getElementById('captionList');
+    rv.innerHTML = queue.map((q, i) => `
+      <div class="crow">
+        <div class="qthumb"><img src="${q.url}" alt=""></div>
+        <input data-i="${i}" maxlength="90" placeholder="Caption foto (opsional)" value="${esc(q.note || '')}">
+        <button class="crm" data-r="${i}" aria-label="Hapus foto">&times;</button>
+      </div>`).join('');
+    rv.querySelectorAll('input[data-i]').forEach(inp => {
+      inp.oninput = () => { queue[Number(inp.dataset.i)].note = inp.value; };
+    });
+    rv.querySelectorAll('button[data-r]').forEach(b => {
+      b.onclick = () => {
+        queue.splice(Number(b.dataset.r), 1);
+        updateQuotaText();
+        if (!queue.length) showShooting(); else showCaption();
+      };
+    });
+    document.getElementById('uploadBtn').textContent = 'Simpan ' + queue.length + ' Foto';
+    document.getElementById('postShotBox').style.display = 'block';
+  }
+  window.addEventListener('beforeunload', (e) => {
+    if (queue.length) { e.preventDefault(); e.returnValue = ''; }
+  });
+  document.getElementById('doneBtn').onclick = () => { if (queue.length) showCaption(); };
+  document.getElementById('backBtn').onclick = showShooting;
+
   function compressForFirestore() {
     const LIMIT = 900000;
     let q = 0.9;
@@ -652,35 +971,28 @@
 
   document.getElementById('shutterBtn').onclick = () => {
     if (!stream) { startCamera(); return; }
+    if (limitReached()) return;
     triggerFlash();
     playShutterSound();
     renderFrame(video, facingMode === 'user');
   };
 
   function handleGalleryUpload(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const img = new Image();
-    img.onload = () => {
-      document.getElementById('camPlaceholder').style.display = 'none';
-      renderFrame(img, false);
-      URL.revokeObjectURL(img.src);
-    };
-    img.src = URL.createObjectURL(file);
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    document.getElementById('camPlaceholder').style.display = 'none';
+    files.forEach(file => {
+      if (limitReached()) return;
+      const img = new Image();
+      img.onload = () => {
+        if (!limitReached()) renderFrame(img, false);
+        URL.revokeObjectURL(img.src);
+      };
+      img.src = URL.createObjectURL(file);
+    });
   }
   document.getElementById('fileInput').onchange = handleGalleryUpload;
   document.getElementById('fileInput2').onchange = handleGalleryUpload;
-
-  document.getElementById('retakeBtn').onclick = () => {
-    hasCaptured = false;
-    capturedDataUrl = '';
-    canvas.style.display = 'none';
-    video.style.display = 'block';
-    document.getElementById('liveControls').style.display = 'flex';
-    document.getElementById('filterBar').style.display = 'grid';
-    document.getElementById('postShotBox').style.display = 'none';
-    if (!stream) startCamera();
-  };
 
   // Koneksi Firebase Firestore Real-Time
   const app = initializeApp(firebaseConfig);
@@ -698,10 +1010,37 @@
     if (!user) return;
     currentUser = user;
     document.getElementById('connDot').classList.add('live');
-    document.getElementById('connText').textContent = 'Terhubung ke Album Live';
+    document.getElementById('connText').textContent = isAdmin ? 'Mode Pengantin (Admin)' : 'Terhubung ke Album Live';
 
     listenPhotos();
+    refreshMyCount();
   });
+
+  // Batas foto per perangkat dengan tampilan 0/20, 1/20, dst.
+  const MAX_PHOTOS = 20;
+  let myCount = 0;
+
+  function updateQuotaText() {
+    const used = Math.min(MAX_PHOTOS, myCount + queue.length);
+    document.getElementById('quotaText').textContent = `${used}/${MAX_PHOTOS}`;
+  }
+
+  async function refreshMyCount() {
+    if (!currentUser) return;
+    try {
+      const snap = await getCountFromServer(query(photosRef, where('uid', '==', currentUser.uid)));
+      myCount = snap.data().count;
+      updateQuotaText();
+    } catch (e) {}
+  }
+
+  function limitReached() {
+    if (myCount + queue.length >= MAX_PHOTOS) {
+      showToast('Batas ' + MAX_PHOTOS + ' foto per perangkat sudah tercapai.');
+      return true;
+    }
+    return false;
+  }
 
   // Muat bertahap: awalnya 30 foto terbaru, tombol "Muat lebih banyak" menambah 30 lagi
   const PAGE_SIZE = 30;
@@ -729,70 +1068,283 @@
   };
 
   document.getElementById('uploadBtn').onclick = async () => {
-    if (!capturedDataUrl || !currentUser) return;
+    if (!queue.length || !currentUser) return;
     const btn = document.getElementById('uploadBtn');
-    const nameVal = document.getElementById('senderName').value.trim() || 'Tamu Undangan';
-    const noteVal = document.getElementById('senderNote').value.trim();
+    const nameVal = guestNameValue || 'Tamu Undangan';
+    const albumNoteVal = document.getElementById('senderNote').value.trim();
+    const total = queue.length;
+    let saved = 0;
 
     btn.disabled = true;
-    btn.textContent = 'Menyimpan...';
-
     try {
-      await addDoc(photosRef, {
-        image: capturedDataUrl,
-        name: nameVal,
-        note: noteVal,
-        filter: currentFilter,
-        uid: currentUser.uid,
-        createdAt: serverTimestamp(),
-        createdAtMs: Date.now()
-      });
+      while (queue.length) {
+        btn.textContent = 'Menyimpan ' + (saved + 1) + '/' + total + '...';
+        const item = queue[0];
+        await addDoc(photosRef, {
+          image: item.url,
+          name: nameVal,
+          note: (item.note || '').trim(),
+          albumNote: albumNoteVal,
+          filter: item.filter,
+          uid: currentUser.uid,
+          createdAt: serverTimestamp(),
+          createdAtMs: Date.now() + saved
+        });
+        queue.shift();
+        saved++;
+        myCount++;
+      }
       document.getElementById('senderNote').value = '';
-      document.getElementById('retakeBtn').click();
-      btn.disabled = false;
-      btn.textContent = 'Simpan ke Album';
+      showShooting();
+      updateQuotaText();
+      showToast(saved + ' foto berhasil disimpan ke album!');
       switchTab('album');
     } catch (err) {
-      alert('Gagal menyimpan foto: ' + err.message);
-      btn.disabled = false;
-      btn.textContent = 'Simpan ke Album';
+      showToast('Gagal menyimpan: ' + err.message);
+      if (captionMode) showCaption();
     }
+    btn.disabled = false;
+    btn.textContent = queue.length ? 'Simpan ' + queue.length + ' Foto' : 'Simpan ke Album';
   };
 
   function esc(str) {
     return String(str || '').replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
   }
 
-  function renderGallery(items, hasMore) {
-    document.getElementById('navCount').textContent = items.length + (hasMore ? '+' : '');
-    const lm = document.getElementById('loadMoreBtn');
-    lm.style.display = hasMore ? 'inline-flex' : 'none';
-    lm.disabled = false;
-    lm.textContent = 'Muat lebih banyak';
-    document.getElementById('photoCountText').textContent = items.length
-      ? `${items.length}${hasMore ? '+' : ''} momen terabadikan`
-      : 'Belum ada foto. Jadilah tamu pertama yang mengabadikan momen!';
+  // ---- Album: satu folder per nama tamu ----
+  let albumItems = [];
+  let albumHasMore = false;
+  let openFolderName = null;
+  let folderItems = [];
 
-    const grid = document.getElementById('galleryGrid');
-    grid.innerHTML = items.map(item => `
-      <div class="polaroid">
-        <img src="${item.image}" alt="Foto dari ${esc(item.name)}" loading="lazy">
-        <div class="cap">${esc(item.name)}</div>
-        ${item.note ? `<div class="msg">${esc(item.note)}</div>` : ''}
-        <div class="act">
-          <a class="mini-link" href="${item.image}" download="DhaniFitrah-${item.id.slice(0,5)}.jpg">Unduh</a>
-          ${currentUser && item.uid === currentUser.uid
-            ? `<button class="mini-link" style="color:#A64B4B" onclick="deletePhoto('${item.id}')">Hapus</button>`
-            : ''}
-        </div>
-      </div>
-    `).join('');
+  function renderGallery(items, hasMore) {
+    albumItems = items;
+    albumHasMore = hasMore;
+    document.getElementById('navCount').textContent = items.length + (hasMore ? '+' : '');
+    renderAlbumView();
   }
 
-  window.deletePhoto = async function(id) {
-    if (!confirm('Hapus foto ini dari album?')) return;
-    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `room_${roomCode}`, id));
+  function renderAlbumView() {
+    const grid = document.getElementById('galleryGrid');
+    const lm = document.getElementById('loadMoreBtn');
+    const back = document.getElementById('albumBack');
+    const countText = document.getElementById('photoCountText');
+    const zipBtn = document.getElementById('downloadZipBtn');
+    const zipText = document.getElementById('downloadZipText');
+
+    if (openFolderName === null) {
+      back.style.display = 'none';
+      lm.style.display = albumHasMore ? 'inline-flex' : 'none';
+      lm.disabled = false;
+      lm.textContent = 'Muat lebih banyak';
+      // Hanya tampilkan tombol unduh seluruh album jika dibuka dengan link admin (?admin=1)
+      zipBtn.style.display = (isAdmin && albumItems.length) ? 'inline-flex' : 'none';
+      zipText.textContent = 'Unduh Semua Album (Full ZIP)';
+
+      const m = new Map();
+      albumItems.forEach(it => {
+        const k = it.name || 'Tamu Undangan';
+        if (!m.has(k)) m.set(k, []);
+        m.get(k).push(it);
+      });
+      const groups = Array.from(m.entries()).map(([name, list]) => ({ name, list }));
+
+      countText.textContent = groups.length
+        ? `${groups.length}${albumHasMore ? '+' : ''} tamu \u00b7 ${albumItems.length}${albumHasMore ? '+' : ''} foto`
+        : 'Belum ada foto. Jadilah tamu pertama yang mengabadikan momen!';
+
+      grid.innerHTML = groups.map((g, i) => `
+        <button class="polaroid folder" data-g="${i}">
+          <div class="fcover">
+            <img src="${g.list[0].image}" alt="Folder ${esc(g.name)}" loading="lazy">
+            <span class="fbadge">${g.list.length}${albumHasMore ? '+' : ''} foto</span>
+          </div>
+          <div class="cap">${esc(g.name)}</div>
+          ${(() => { const an = (g.list.find(i => i.albumNote) || {}).albumNote; return an ? `<div class="msg">${esc(an)}</div>` : ''; })()}
+        </button>
+      `).join('');
+      grid.querySelectorAll('.folder').forEach(btn => {
+        btn.onclick = () => openFolder(groups[Number(btn.dataset.g)].name);
+      });
+    } else {
+      back.style.display = 'block';
+      lm.style.display = 'none';
+      zipBtn.style.display = folderItems.length ? 'inline-flex' : 'none';
+      zipText.textContent = `Unduh Folder ${openFolderName} (ZIP)`;
+      countText.textContent = `${folderItems.length} foto dari ${openFolderName}`;
+      const albumNotes = [...new Set(folderItems.map(i => (i.albumNote || '').trim()).filter(Boolean))];
+      const notesHtml = albumNotes.length
+        ? `<div class="albumnote">${albumNotes.map(n => '&ldquo;' + esc(n) + '&rdquo;').join('<br>')}</div>`
+        : '';
+      grid.innerHTML = notesHtml + folderItems.map((item, idx) => `
+        <div class="polaroid">
+          <img src="${item.image}" alt="Foto dari ${esc(item.name)}" loading="lazy" onclick="openLightbox(${idx})">
+          ${item.note ? `<div class="msg" style="margin-top:8px">${esc(item.note)}</div>` : ''}
+          <div class="act">
+            <a class="dl-pill" href="${item.image}" download="DhaniFitrah-${item.id.slice(0,5)}.jpg">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Unduh
+            </a>
+            ${currentUser && item.uid === currentUser.uid
+              ? `<button class="mini-link" style="color:#A64B4B" onclick="deletePhoto('${item.id}')">Hapus</button>`
+              : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Lightbox Preview Layar Penuh
+  window.openLightbox = function(idx) {
+    const item = folderItems[idx];
+    if (!item) return;
+    document.getElementById('lbImg').src = item.image;
+    document.getElementById('lbName').textContent = item.name || 'Tamu Undangan';
+    document.getElementById('lbNote').textContent = item.note || item.albumNote || '';
+    const dl = document.getElementById('lbDownload');
+    dl.href = item.image;
+    dl.download = `DhaniFitrah-${(item.name || 'Tamu').replace(/\s+/g, '_')}-${item.id.slice(0,4)}.jpg`;
+    document.getElementById('lightboxModal').classList.add('open');
   };
+  document.getElementById('lbClose').onclick = () => document.getElementById('lightboxModal').classList.remove('open');
+  document.getElementById('lightboxModal').onclick = (e) => {
+    if (e.target.id === 'lightboxModal') e.target.classList.remove('open');
+  };
+
+  // Unduh Semua Foto (per folder tamu atau seluruh album pernikahan jika ?admin=1)
+  document.getElementById('downloadZipBtn').onclick = async function() {
+    if (typeof JSZip === 'undefined') return;
+    const textEl = document.getElementById('downloadZipText');
+    const origText = textEl.textContent;
+    this.disabled = true;
+
+    try {
+      const zip = new JSZip();
+
+      if (openFolderName === null && isAdmin) {
+        // Mode Admin: ambil SELURUH foto dari Firestore (tanpa batas 30) dan kelompokkan ke folder per nama tamu
+        textEl.textContent = 'Mengambil semua foto...';
+        const snap = await getDocs(query(photosRef, orderBy('createdAtMs', 'asc')));
+        const allList = [];
+        snap.forEach(d => allList.push({ id: d.id, ...d.data() }));
+
+        if (!allList.length) {
+          showToast('Belum ada foto di album.');
+          this.disabled = false;
+          textEl.textContent = origText;
+          return;
+        }
+
+        textEl.textContent = `Membungkus ${allList.length} foto...`;
+        const counterPerGuest = {};
+        allList.forEach(item => {
+          const base64Data = item.image.split(',')[1];
+          if (base64Data) {
+            const folderSafe = (item.name || 'Tamu_Undangan').replace(/[^a-zA-Z0-9-_ ]/g, '_').trim() || 'Tamu';
+            counterPerGuest[folderSafe] = (counterPerGuest[folderSafe] || 0) + 1;
+            zip.file(`${folderSafe}/${folderSafe}_${counterPerGuest[folderSafe]}.jpg`, base64Data, { base64: true });
+          }
+        });
+
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Album_Pernikahan_Dhani_Fitrah.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        showToast(`${allList.length} foto berhasil diunduh!`);
+      } else if (openFolderName !== null && folderItems.length) {
+        // Mode Folder Tamu: unduh foto milik tamu yang sedang dibuka
+        textEl.textContent = 'Menyiapkan ZIP...';
+        folderItems.forEach((item, idx) => {
+          const base64Data = item.image.split(',')[1];
+          if (base64Data) {
+            const safeName = (item.name || 'Tamu').replace(/[^a-zA-Z0-9-_]/g, '_');
+            zip.file(`${safeName}_${idx + 1}.jpg`, base64Data, { base64: true });
+          }
+        });
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Album_${openFolderName.replace(/\s+/g, '_')}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        showToast('File ZIP berhasil diunduh!');
+      }
+    } catch (e) {
+      showToast('Gagal membuat ZIP: ' + e.message);
+    }
+    this.disabled = false;
+    textEl.textContent = origText;
+  };
+
+  async function openFolder(name) {
+    openFolderName = name;
+    folderItems = [];
+    document.getElementById('photoCountText').textContent = 'Memuat foto...';
+    document.getElementById('galleryGrid').innerHTML = '';
+    document.getElementById('albumBack').style.display = 'block';
+    document.getElementById('loadMoreBtn').style.display = 'none';
+    document.getElementById('downloadZipBtn').style.display = 'none';
+    try {
+      const snap = await getDocs(query(photosRef, where('name', '==', name)));
+      const list = [];
+      snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+      list.sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+      folderItems = list;
+      if (!list.length) openFolderName = null;
+    } catch (err) {
+      showToast('Gagal memuat folder: ' + err.message);
+      openFolderName = null;
+    }
+    renderAlbumView();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.getElementById('albumBackBtn').onclick = () => {
+    openFolderName = null;
+    renderAlbumView();
+  };
+
+  window.deletePhoto = async function(id) {
+    const ok = await showConfirm('Hapus foto ini dari album?');
+    if (!ok) return;
+    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', `room_${roomCode}`, id));
+    refreshMyCount();
+    showToast('Foto berhasil dihapus');
+    if (openFolderName !== null) openFolder(openFolderName);
+  };
+
+  // Isi nama di awal
+  function submitGateName() {
+    const v = document.getElementById('gateName').value.trim().slice(0, 36);
+    if (!v) { document.getElementById('gateName').focus(); return; }
+    guestNameValue = v;
+    try { localStorage.setItem('guestName', v); } catch (e) {}
+    applyGuestName();
+    if (!stream) startCamera();
+  }
+  document.getElementById('gateBtn').onclick = submitGateName;
+  document.getElementById('gateName').addEventListener('keydown', e => { if (e.key === 'Enter') submitGateName(); });
+  document.getElementById('changeNameBtn').onclick = () => {
+    guestNameValue = '';
+    document.getElementById('gateName').value = '';
+    applyGuestName();
+    document.getElementById('gateName').focus();
+  };
+
+  // Buka langsung ke kamera saat diakses melalui QR Code bersih (kecuali link admin)
+  if (params.get('mode') === 'camera' || (!params.get('tab') && !params.get('mode') && !isAdmin)) {
+    window.switchTab('camera');
+  } else if (isAdmin) {
+    window.switchTab('album');
+  }
 </script>
 </body>
 </html>
