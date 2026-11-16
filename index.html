@@ -41,7 +41,6 @@
     padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
     overflow-x: hidden;
   }
-  /* Tekstur kertas cat air halus */
   body::before {
     content: "";
     position: fixed;
@@ -52,7 +51,6 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0.94 0 1 0 0 0.93 0 0 1 0 0.89 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E");
   }
 
-  /* Kelopak melayang halus */
   .petals { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
   .petal { position: absolute; top: -10%; opacity: 0; animation: floatPetal linear infinite; }
   .petal.blush { width: 10px; height: 7px; background: radial-gradient(circle at 30% 30%, #F5D5D6, #DF9FA2); border-radius: 75% 15% 75% 15%; }
@@ -67,9 +65,7 @@
 
   .wrap { position: relative; z-index: 2; max-width: 520px; margin: 0 auto; padding: 24px 18px; }
   .script { font-family: 'Alex Brush', cursive; font-weight: 400; line-height: 1.15; }
-  .serif-title { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; }
 
-  /* Header Monogram */
   header { text-align: center; padding: 8px 0 18px; }
   header h1 {
     font-family: 'Cormorant Garamond', Georgia, serif;
@@ -83,7 +79,6 @@
 
   body.cam-mode header { display: none; }
 
-  /* Status pill */
   .status-bar {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: .74rem; color: var(--acc);
@@ -95,7 +90,6 @@
   .dot { width: 7px; height: 7px; border-radius: 50%; background: #9CA383; }
   .dot.live { background: #566B44; box-shadow: 0 0 0 3px rgba(86,107,68,0.18); }
 
-  /* Kartu Double-Border khas Undangan */
   .card {
     position: relative;
     overflow: hidden;
@@ -119,7 +113,6 @@
   .sprig.tl { top: -4px; left: -4px; }
   .sprig.br { bottom: -4px; right: -4px; transform: rotate(180deg); }
 
-  /* Tombol */
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     border: 1px solid var(--acc);
@@ -137,12 +130,10 @@
   .btn.fill:hover { background: #4E4E34; }
   .btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-  /* Tab Panels */
   .panel { display: none; animation: fadeIn .35s ease; }
   .panel.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-  /* QR Box */
   .qr-frame {
     position: relative;
     display: inline-block;
@@ -159,17 +150,16 @@
   .qr-frame:active { transform: scale(0.97); }
   #qrcode img, #qrcode canvas { display: block; margin: 0 auto; border-radius: 6px; }
 
-  /* Kamera */
   .cam-shell {
     position: relative;
-    width: min(100%, max(200px, calc((100svh - 480px) * 0.75)));
+    width: min(100%, max(250px, calc((100svh - 380px) * 0.75)));
     aspect-ratio: 3 / 4;
     margin-left: auto; margin-right: auto;
     background: #23231B;
     border-radius: 18px;
     overflow: hidden;
     border: 1.5px solid #C8C4B0;
-    margin: 10px auto 14px;
+    margin: 18px auto 14px;
   }
   #video, #previewCanvas {
     width: 100%; height: 100%;
@@ -180,11 +170,38 @@
   .cam-placeholder {
     position: absolute; inset: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 24px; color: #EAE8DF; text-align: center;
+    padding: 18px 16px; color: #EAE8DF; text-align: center;
     background: linear-gradient(160deg, #3A3A2B 0%, #26261C 100%);
   }
+  .cam-trust-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 3px 9px; border-radius: 999px;
+    font-size: .64rem; color: #DFDCD0;
+    margin-bottom: 8px;
+  }
+  #video, #previewCanvas {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  #previewCanvas { display: none; }
+  .cam-placeholder {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px; color: #EAE8DF; text-align: center;
+    background: linear-gradient(160deg, #3A3A2B 0%, #26261C 100%);
+  }
+  .cam-trust-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px 11px; border-radius: 999px;
+    font-size: .7rem; color: #DFDCD0;
+    margin-bottom: 10px;
+  }
 
-  /* Filter Pills */
   .filters {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
     padding: 4px 2px 10px;
@@ -216,8 +233,8 @@
     color: var(--ink); display: flex; align-items: center; justify-content: center;
     cursor: pointer;
   }
+  .icon-btn:active { transform: scale(0.92); }
 
-  /* Form Upload setelah Jepret */
   .post-shot { text-align: left; margin-top: 12px; }
   .post-shot label { display: block; font-size: .8rem; font-weight: 600; margin-bottom: 4px; color: var(--acc); }
   .post-shot input {
@@ -227,7 +244,6 @@
     font: 400 .9rem 'Noto Serif', serif;
   }
 
-  /* Galeri Album Polaroid */
   .gallery-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -264,7 +280,6 @@
   .dl-pill:hover { background: #4E4E34; }
   .dl-pill:active { transform: scale(0.95); }
 
-  /* Antrian foto sebelum disimpan */
   .qstrip { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: none; }
   .qstrip::-webkit-scrollbar { display: none; }
   .qthumb { position: relative; flex: none; width: 54px; height: 72px; }
@@ -274,7 +289,6 @@
     border: none; background: #4A4A38; color: #fff; font-size: .8rem; line-height: 1; cursor: pointer; padding: 0;
   }
 
-  /* Caption per foto */
   .crow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .crow .qthumb { width: 54px; height: 72px; flex: none; }
   .crow input { flex: 1; width: auto; margin: 0; padding: 9px 12px; font-size: .84rem; min-width: 0; }
@@ -284,7 +298,6 @@
   }
   .albumnote { grid-column: 1 / -1; text-align: left; font-size: .8rem; color: var(--mut); font-style: italic; line-height: 1.45; }
 
-  /* Overlay antrian di dalam kamera */
   .q-overlay { position: absolute; inset: 0; pointer-events: none; }
   .q-overlay .qstrip {
     position: absolute; left: 8px; right: 8px; bottom: 8px; pointer-events: auto;
@@ -293,7 +306,6 @@
   .q-overlay .qthumb { width: 38px; height: 50px; }
   .q-overlay .qthumb img { border-color: rgba(255,255,255,0.7); }
 
-  /* Folder tamu di album */
   .folder { width: 100%; font-family: inherit; cursor: pointer; }
   .fcover { position: relative; }
   .fbadge {
@@ -302,7 +314,6 @@
     padding: 2px 9px; border-radius: 999px;
   }
 
-  /* Navigasi Bawah Melayang */
   nav.bottom-nav {
     position: fixed;
     left: 50%;
@@ -334,7 +345,6 @@
   }
   .flash-fx.bang { opacity: 0.92; transition: none; }
 
-  /* Toast & Modal Custom (pengganti alert/confirm) */
   .toast-msg {
     position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-16px);
     background: #4A4A38; color: #FFFFFF; padding: 10px 18px; border-radius: 999px;
@@ -395,7 +405,7 @@
         <div id="lbName" style="font-weight:600;font-size:.92rem;color:var(--acc)"></div>
         <div id="lbNote" style="font-size:.8rem;color:var(--mut);margin-top:2px"></div>
       </div>
-      <a class="btn fill" id="lbDownload" href="#" download="DhaniFitrah.jpg" style="padding:8px 16px;font-size:.8rem;flex-shrink:0">
+      <a class="btn fill" id="lbDownload" href="#" download="DhaniFitrah.jpg" style="display:none;padding:8px 16px;font-size:.8rem;flex-shrink:0">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Unduh Foto
       </a>
@@ -442,13 +452,12 @@
         <span style="font-size:.78rem;color:var(--mut)">Halo, <strong id="guestDisplay" style="color:var(--acc)">Tamu Undangan</strong> <button class="mini-link" id="changeNameBtn" style="margin-left:4px">ganti</button></span>
       </div>
 
-      <!-- Isi nama sekali di awal -->
       <div id="nameGate" style="display:none;padding:18px 4px 8px;text-align:center">
         <h2 class="script" style="font-size:2.1rem;color:var(--acc);margin:0 0 6px">Siapa namamu?</h2>
         <p style="font-size:.84rem;color:var(--mut);margin:0 0 14px">Cukup isi sekali. Nama ini akan tampil di semua fotomu.</p>
         <input id="gateName" placeholder="Tulis namamu..." maxlength="36" autocomplete="name"
                style="width:100%;padding:11px 14px;margin-bottom:12px;border:1px solid #D5D2C2;border-radius:12px;background:#fff;color:var(--ink);font:400 .95rem 'Noto Serif',serif;text-align:center">
-        <button class="btn fill" id="gateBtn" style="width:100%">Mulai Memotret</button>
+        <button class="btn fill" id="gateBtn" style="width:100%">Lanjut ke Kamera</button>
       </div>
 
       <div id="camArea">
@@ -456,22 +465,27 @@
           <video id="video" playsinline autoplay muted></video>
           <canvas id="previewCanvas"></canvas>
 
+          <!-- Soft-Prompt Ramah Sebelum Pop-Up Izin Browser Muncul -->
           <div class="cam-placeholder" id="camPlaceholder">
-            <p style="font-size:.92rem;margin:0 0 12px">Kamera siap digunakan untuk mengabadikan momen.</p>
-            <button class="btn fill" id="startCamBtn" style="background:#FAF9F5;color:#4A4A38;border-color:#FAF9F5">Aktifkan Kamera</button>
-            <label class="btn" style="margin-top:10px;font-size:.78rem;color:#FAF9F5;border-color:rgba(255,255,255,0.45);cursor:pointer">
-              Atau Pilih Foto dari Galeri
+            <div class="cam-trust-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Privasi Terjaga
+            </div>
+            <p id="camMsg" style="font-size:.76rem;margin:0 0 12px;line-height:1.45;color:#F4F2EA;max-width:240px">
+              Browser akan meminta izin kamera. Hanya aktif saat halaman ini dibuka dan tidak merekam otomatis.
+            </p>
+            <button class="btn fill" id="startCamBtn" style="background:#FAF9F5;color:#4A4A38;border-color:#FAF9F5;font-weight:600;font-size:.78rem;padding:8px 16px">Buka Kamera</button>
+            <label class="btn" style="margin-top:8px;font-size:.7rem;padding:6px 13px;color:#FAF9F5;border-color:rgba(255,255,255,0.4);cursor:pointer">
+              Pilih dari Galeri
               <input type="file" id="fileInput" accept="image/*" multiple hidden>
             </label>
           </div>
 
-          <!-- Gambar kecil foto yang sudah dijepret -->
           <div class="q-overlay" id="queueOverlay" style="display:none">
             <div class="qstrip" id="queueStrip"></div>
           </div>
         </div>
 
-        <!-- Pilihan Filter -->
         <div class="filters" id="filterBar">
           <button class="flt on" data-filter="warm">Hangat</button>
           <button class="flt" data-filter="flash">Flash</button>
@@ -481,7 +495,6 @@
           <button class="flt" data-filter="mono">Hitam Putih</button>
         </div>
 
-        <!-- Kontrol Jepret -->
         <div class="cam-controls" id="liveControls">
           <label class="icon-btn" title="Pilih dari galeri" style="cursor:pointer">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
@@ -493,13 +506,11 @@
           </button>
         </div>
 
-        <!-- Tombol selesai -->
         <div id="queueBar" style="margin-top:12px">
           <button class="btn fill" id="doneBtn" style="width:100%;padding:9px 18px" disabled>Selesai &middot; <span id="quotaText">0/20</span></button>
           <div id="unsavedNote" style="visibility:hidden;font-size:.7rem;color:var(--mut);text-align:center;margin-top:5px">Foto belum tersimpan sampai kamu menekan Selesai, lalu Simpan.</div>
         </div>
 
-        <!-- Form Caption (sekali untuk semua foto) -->
         <div class="post-shot" id="postShotBox" style="display:none">
           <div id="captionList"></div>
           <label for="senderNote" style="margin-top:4px">Caption album (Opsional)</label>
@@ -509,7 +520,7 @@
             <button class="btn fill" id="uploadBtn" style="flex:2">Simpan ke Album</button>
           </div>
         </div>
-      </div><!-- /camArea -->
+      </div>
     </div>
   </section>
 
@@ -548,7 +559,6 @@
   import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
   import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, orderBy, limit, where, getCountFromServer, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-  // Konfigurasi Firebase Proyek moment-ab45b
   const CUSTOM_FIREBASE_CONFIG = {
     apiKey: "AIzaSyBc6L-QNgEp318uFVEr0qYPlpCJF2BjYKQ",
     authDomain: "moment-ab45b.firebaseapp.com",
@@ -565,7 +575,6 @@
 
   const appId = (typeof __app_id !== 'undefined') ? __app_id : 'dhani-fitrah-wedding';
 
-  // Inisialisasi Kelopak Bunga Melayang
   (function initPetals() {
     const box = document.getElementById('petals');
     const types = ['blush', 'white'];
@@ -580,7 +589,6 @@
     }
   })();
 
-  // Parameter URL (?room=... & ?to=... & ?admin=1)
   const params = new URLSearchParams(location.search);
   const roomCode = (params.get('room') || 'DHANI-FITRAH').toUpperCase().replace(/[^A-Z0-9-_]/g, '').slice(0, 24) || 'DHANI-FITRAH';
   const guestName = (params.get('to') || params.get('kepada') || '').trim().slice(0, 36);
@@ -605,7 +613,6 @@
     });
   }
 
-  // Nama tamu: dari link (?to=) atau yang tersimpan di perangkat ini
   let guestNameValue = guestName;
   if (!guestNameValue) {
     try { guestNameValue = (localStorage.getItem('guestName') || '').slice(0, 36); } catch (e) {}
@@ -619,7 +626,6 @@
   }
   applyGuestName();
 
-  // Generate QR Code dengan URL bersih (tanpa query panjang agar QR renggang & cepat di-scan)
   const cleanBaseUrl = location.origin + location.pathname;
 
   new QRCode(document.getElementById('qrcode'), {
@@ -631,7 +637,6 @@
     correctLevel: QRCode.CorrectLevel.M
   });
 
-  // Unduh Kartu QR Siap Cetak saat kotak QR ditekan
   document.getElementById('qrBoxTrigger').onclick = async function() {
     const qrSource = document.querySelector('#qrcode canvas') || document.querySelector('#qrcode img');
     if (!qrSource) { showToast('QR Code belum siap.'); return; }
@@ -731,15 +736,28 @@
     }
   };
 
-  // Navigasi Tab
   window.switchTab = function(tab) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
     document.getElementById('panel-' + tab).classList.add('active');
     document.body.classList.toggle('cam-mode', tab === 'camera');
     document.querySelector(`.bottom-nav button[data-tab="${tab}"]`).classList.add('active');
-    if (tab === 'camera' && guestNameValue && !stream) startCamera();
+    // Jika izin kamera pernah diberikan sebelumnya di perangkat ini, langsung aktifkan tanpa menunggu klik ulang
+    if (tab === 'camera' && guestNameValue && !stream) {
+      checkAndAutoStartCamera();
+    }
   };
+
+  async function checkAndAutoStartCamera() {
+    try {
+      if (navigator.permissions && navigator.permissions.query) {
+        const perm = await navigator.permissions.query({ name: 'camera' });
+        if (perm.state === 'granted') {
+          startCamera();
+        }
+      }
+    } catch (e) {}
+  }
 
   // Logika Kamera & Filter
   const video = document.getElementById('video');
@@ -748,6 +766,7 @@
   let stream = null;
   let facingMode = 'environment';
   let currentFilter = 'warm';
+  let isStartingCam = false;
   const queue = [];
 
   const FILTERS = {
@@ -803,25 +822,78 @@
   });
   video.style.filter = FILTERS.warm.css;
 
-  async function startCamera() {
+  async function startCamera(requestedFacing) {
+    if (isStartingCam) return;
+    isStartingCam = true;
+    const targetMode = requestedFacing || facingMode;
+    const ph = document.getElementById('camPlaceholder');
+    const msgEl = document.getElementById('camMsg');
+
     try {
-      if (stream) stream.getTracks().forEach(t => t.stop());
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode, width: { ideal: 1920 }, height: { ideal: 1440 }, frameRate: { ideal: 30 } },
-        audio: false
-      });
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('UNSUPPORTED');
+      }
+
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+        video.srcObject = null;
+        await new Promise(r => setTimeout(r, 120));
+      }
+
+      let newStream = null;
+      try {
+        newStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: targetMode }, width: { ideal: 1920 }, height: { ideal: 1440 } },
+          audio: false
+        });
+      } catch (e1) {
+        try {
+          newStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: targetMode },
+            audio: false
+          });
+        } catch (e2) {
+          newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        }
+      }
+
+      stream = newStream;
+      facingMode = targetMode;
       video.srcObject = stream;
-      video.style.transform = facingMode === 'user' ? 'scaleX(-1)' : 'none';
-      document.getElementById('camPlaceholder').style.display = 'none';
+      await video.play().catch(() => {});
+
+      const track = stream.getVideoTracks()[0];
+      const settings = track && track.getSettings ? track.getSettings() : {};
+      const actualFacing = settings.facingMode || facingMode;
+      video.style.transform = actualFacing === 'user' ? 'scaleX(-1)' : 'none';
+
+      ph.style.display = 'none';
     } catch (err) {
-      document.getElementById('camPlaceholder').style.display = 'flex';
+      ph.style.display = 'flex';
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        msgEl.innerHTML = 'Tidak masalah! Jika ragu memberi izin kamera ke browser, kamu tetap bisa memotret pakai kamera HP biasa lalu tekan tombol <strong>Pilih Foto dari Galeri</strong> di bawah.';
+        showToast('Izin kamera tidak diaktifkan');
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        msgEl.textContent = 'Kamera tidak ditemukan pada perangkat ini. Silakan pilih foto dari galeri.';
+        showToast('Kamera tidak ditemukan');
+      } else {
+        msgEl.innerHTML = 'Kamera langsung tidak tersedia di aplikasi ini.<br><span style="font-size:.76rem;opacity:.85">Buka di Chrome/Safari atau unggah foto dari galeri di bawah.</span>';
+      }
+    } finally {
+      isStartingCam = false;
     }
   }
 
-  document.getElementById('startCamBtn').onclick = startCamera;
+  document.getElementById('startCamBtn').onclick = () => startCamera(facingMode);
   document.getElementById('flipCamBtn').onclick = () => {
-    facingMode = facingMode === 'environment' ? 'user' : 'environment';
-    startCamera();
+    if (!stream) {
+      startCamera(facingMode);
+      return;
+    }
+    const nextMode = facingMode === 'environment' ? 'user' : 'environment';
+    showToast(nextMode === 'user' ? 'Beralih ke kamera depan...' : 'Beralih ke kamera belakang...');
+    startCamera(nextMode);
   };
 
   function playShutterSound() {
@@ -882,7 +954,6 @@
     updateQuotaText();
   }
 
-  // ---- Tampilan antrian & caption ----
   function thumbsHtml() {
     return queue.map((q, i) => `<div class="qthumb"><img src="${q.url}" alt=""><button data-i="${i}" aria-label="Hapus foto">&times;</button></div>`).join('');
   }
@@ -913,7 +984,6 @@
     document.getElementById('postShotBox').style.display = 'none';
     document.getElementById('queueBar').style.display = 'block';
     updateQueueUI();
-    if (!stream) startCamera();
   }
   function showCaption() {
     captionMode = true;
@@ -980,12 +1050,15 @@
   function handleGalleryUpload(e) {
     const files = Array.from(e.target.files || []);
     e.target.value = '';
-    document.getElementById('camPlaceholder').style.display = 'none';
+    if (!files.length) return;
     files.forEach(file => {
       if (limitReached()) return;
       const img = new Image();
       img.onload = () => {
-        if (!limitReached()) renderFrame(img, false);
+        if (!limitReached()) {
+          renderFrame(img, false);
+          showToast('Foto ditambahkan ke antrian');
+        }
         URL.revokeObjectURL(img.src);
       };
       img.src = URL.createObjectURL(file);
@@ -1016,7 +1089,6 @@
     refreshMyCount();
   });
 
-  // Batas foto per perangkat dengan tampilan 0/20, 1/20, dst.
   const MAX_PHOTOS = 20;
   let myCount = 0;
 
@@ -1042,7 +1114,6 @@
     return false;
   }
 
-  // Muat bertahap: awalnya 30 foto terbaru, tombol "Muat lebih banyak" menambah 30 lagi
   const PAGE_SIZE = 30;
   let visibleLimit = PAGE_SIZE;
   let unsubscribe = null;
@@ -1117,6 +1188,11 @@
   let openFolderName = null;
   let folderItems = [];
 
+  function isOwnerOrAdmin(item) {
+    if (isAdmin) return true;
+    return Boolean(currentUser && item && item.uid === currentUser.uid);
+  }
+
   function renderGallery(items, hasMore) {
     albumItems = items;
     albumHasMore = hasMore;
@@ -1137,7 +1213,6 @@
       lm.style.display = albumHasMore ? 'inline-flex' : 'none';
       lm.disabled = false;
       lm.textContent = 'Muat lebih banyak';
-      // Hanya tampilkan tombol unduh seluruh album jika dibuka dengan link admin (?admin=1)
       zipBtn.style.display = (isAdmin && albumItems.length) ? 'inline-flex' : 'none';
       zipText.textContent = 'Unduh Semua Album (Full ZIP)';
 
@@ -1169,32 +1244,42 @@
     } else {
       back.style.display = 'block';
       lm.style.display = 'none';
-      zipBtn.style.display = folderItems.length ? 'inline-flex' : 'none';
-      zipText.textContent = `Unduh Folder ${openFolderName} (ZIP)`;
+
+      const myOwnedInFolder = folderItems.filter(it => currentUser && it.uid === currentUser.uid);
+      const canZipFolder = isAdmin || myOwnedInFolder.length > 0;
+      zipBtn.style.display = canZipFolder ? 'inline-flex' : 'none';
+      zipText.textContent = isAdmin
+        ? `Unduh Folder ${openFolderName} (ZIP)`
+        : `Unduh Fotoku (${myOwnedInFolder.length} ZIP)`;
+
       countText.textContent = `${folderItems.length} foto dari ${openFolderName}`;
       const albumNotes = [...new Set(folderItems.map(i => (i.albumNote || '').trim()).filter(Boolean))];
       const notesHtml = albumNotes.length
         ? `<div class="albumnote">${albumNotes.map(n => '&ldquo;' + esc(n) + '&rdquo;').join('<br>')}</div>`
         : '';
-      grid.innerHTML = notesHtml + folderItems.map((item, idx) => `
+      grid.innerHTML = notesHtml + folderItems.map((item, idx) => {
+        const isMine = currentUser && item.uid === currentUser.uid;
+        const canDownload = isAdmin || isMine;
+        return `
         <div class="polaroid">
           <img src="${item.image}" alt="Foto dari ${esc(item.name)}" loading="lazy" onclick="openLightbox(${idx})">
           ${item.note ? `<div class="msg" style="margin-top:8px">${esc(item.note)}</div>` : ''}
+          ${(canDownload || isMine) ? `
           <div class="act">
+            ${canDownload ? `
             <a class="dl-pill" href="${item.image}" download="DhaniFitrah-${item.id.slice(0,5)}.jpg">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Unduh
-            </a>
-            ${currentUser && item.uid === currentUser.uid
+            </a>` : '<span></span>'}
+            ${isMine
               ? `<button class="mini-link" style="color:#A64B4B" onclick="deletePhoto('${item.id}')">Hapus</button>`
               : ''}
-          </div>
-        </div>
-      `).join('');
+          </div>` : ''}
+        </div>`;
+      }).join('');
     }
   }
 
-  // Lightbox Preview Layar Penuh
   window.openLightbox = function(idx) {
     const item = folderItems[idx];
     if (!item) return;
@@ -1202,8 +1287,14 @@
     document.getElementById('lbName').textContent = item.name || 'Tamu Undangan';
     document.getElementById('lbNote').textContent = item.note || item.albumNote || '';
     const dl = document.getElementById('lbDownload');
-    dl.href = item.image;
-    dl.download = `DhaniFitrah-${(item.name || 'Tamu').replace(/\s+/g, '_')}-${item.id.slice(0,4)}.jpg`;
+    if (isOwnerOrAdmin(item)) {
+      dl.style.display = 'inline-flex';
+      dl.href = item.image;
+      dl.download = `DhaniFitrah-${(item.name || 'Tamu').replace(/\s+/g, '_')}-${item.id.slice(0,4)}.jpg`;
+    } else {
+      dl.style.display = 'none';
+      dl.href = '#';
+    }
     document.getElementById('lightboxModal').classList.add('open');
   };
   document.getElementById('lbClose').onclick = () => document.getElementById('lightboxModal').classList.remove('open');
@@ -1211,7 +1302,6 @@
     if (e.target.id === 'lightboxModal') e.target.classList.remove('open');
   };
 
-  // Unduh Semua Foto (per folder tamu atau seluruh album pernikahan jika ?admin=1)
   document.getElementById('downloadZipBtn').onclick = async function() {
     if (typeof JSZip === 'undefined') return;
     const textEl = document.getElementById('downloadZipText');
@@ -1222,7 +1312,6 @@
       const zip = new JSZip();
 
       if (openFolderName === null && isAdmin) {
-        // Mode Admin: ambil SELURUH foto dari Firestore (tanpa batas 30) dan kelompokkan ke folder per nama tamu
         textEl.textContent = 'Mengambil semua foto...';
         const snap = await getDocs(query(photosRef, orderBy('createdAtMs', 'asc')));
         const allList = [];
@@ -1256,10 +1345,20 @@
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 10000);
         showToast(`${allList.length} foto berhasil diunduh!`);
-      } else if (openFolderName !== null && folderItems.length) {
-        // Mode Folder Tamu: unduh foto milik tamu yang sedang dibuka
+      } else if (openFolderName !== null) {
+        const targetItems = isAdmin
+          ? folderItems
+          : folderItems.filter(it => currentUser && it.uid === currentUser.uid);
+
+        if (!targetItems.length) {
+          showToast('Tidak ada foto milikmu di folder ini.');
+          this.disabled = false;
+          textEl.textContent = origText;
+          return;
+        }
+
         textEl.textContent = 'Menyiapkan ZIP...';
-        folderItems.forEach((item, idx) => {
+        targetItems.forEach((item, idx) => {
           const base64Data = item.image.split(',')[1];
           if (base64Data) {
             const safeName = (item.name || 'Tamu').replace(/[^a-zA-Z0-9-_]/g, '_');
@@ -1321,14 +1420,14 @@
     if (openFolderName !== null) openFolder(openFolderName);
   };
 
-  // Isi nama di awal
+  // Tidak langsung memanggil startCamera() setelah isi nama agar tidak memunculkan pop-up izin secara mendadak
   function submitGateName() {
     const v = document.getElementById('gateName').value.trim().slice(0, 36);
     if (!v) { document.getElementById('gateName').focus(); return; }
     guestNameValue = v;
     try { localStorage.setItem('guestName', v); } catch (e) {}
     applyGuestName();
-    if (!stream) startCamera();
+    checkAndAutoStartCamera();
   }
   document.getElementById('gateBtn').onclick = submitGateName;
   document.getElementById('gateName').addEventListener('keydown', e => { if (e.key === 'Enter') submitGateName(); });
@@ -1339,7 +1438,6 @@
     document.getElementById('gateName').focus();
   };
 
-  // Buka langsung ke kamera saat diakses melalui QR Code bersih (kecuali link admin)
   if (params.get('mode') === 'camera' || (!params.get('tab') && !params.get('mode') && !isAdmin)) {
     window.switchTab('camera');
   } else if (isAdmin) {
